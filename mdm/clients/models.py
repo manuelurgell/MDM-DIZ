@@ -19,6 +19,7 @@ class ClienteInfo(models.Model):
     cp = models.CharField(max_length=10, null=True)
     estado = models.CharField(max_length=50, null=True)
     entreCalles = models.CharField(max_length=50, null=True)
+    is_main = models.BooleanField(default=False)
 
     class Meta:
         verbose_name_plural = "Clientes Info"

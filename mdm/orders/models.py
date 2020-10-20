@@ -6,7 +6,6 @@ class Compra(models.Model):
     cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)
     noTarjeta = models.CharField(max_length=30)
     fecha = models.DateTimeField()
-    hora = models.CharField(max_length=30)
     total = models.CharField(max_length=50)
     calle = models.CharField(max_length=50)
     numero = models.CharField(max_length=50)
@@ -19,9 +18,9 @@ class Compra(models.Model):
 
 class Pedido(models.Model):
     compra = models.ForeignKey(Compra, on_delete=models.CASCADE)
-    codigoProductos = models.CharField(max_length=30)
-    cantidadProductos = models.CharField(max_length=30)
-    precioProductos = models.CharField(max_length=30)
+    codigoProducto = models.CharField(max_length=30)
+    cantidadProducto = models.CharField(max_length=30)
+    precioProducto = models.CharField(max_length=30)
 
 
 class Factura(models.Model):
