@@ -85,8 +85,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'MDM',
-        'USER': 'root',
-        'PASSWORD': 'Password',
+        'USER': 'GCP-User',
+        'PASSWORD': 'PasswordGCP',
         'HOST': '34.67.186.33',
         'PORT': '3306',
     }
