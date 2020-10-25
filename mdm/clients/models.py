@@ -27,7 +27,7 @@ class ClienteInfo(models.Model):
 
 class Carrito(models.Model):
     cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)
-    fecha = models.DateField()
+    fecha = models.DateTimeField()
 
 
 class CarritoInfo(models.Model):
