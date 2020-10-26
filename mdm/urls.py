@@ -13,12 +13,11 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
-
-from mdm.clients.views import SaveCarritoViewSet
+from django.urls import include, path
+from mdm.clients import urls as urls_clientes
+# from mdm.orders import urls as urls_orders
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('carrito/savecarrito', SaveCarritoViewSet)
-
+    path('', include(urls_clientes))
 ]

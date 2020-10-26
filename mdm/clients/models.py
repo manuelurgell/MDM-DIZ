@@ -7,18 +7,19 @@ class Cliente(models.Model):
     apellidoMat = models.CharField(max_length=30)
     fechaNac = models.DateField()
     genero = models.CharField(max_length=30)
+    created = models.DateTimeField(auto_now_add=True)
 
 
 class ClienteInfo(models.Model):
     cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)
-    telefono = models.CharField(max_length=30, null=True)
-    correo = models.EmailField(max_length=30, null=True)
-    calle = models.CharField(max_length=50, null=True)
-    colonia = models.CharField(max_length=50, null=True)
-    cuidad = models.CharField(max_length=50, null=True)
-    cp = models.CharField(max_length=10, null=True)
-    estado = models.CharField(max_length=50, null=True)
-    entreCalles = models.CharField(max_length=50, null=True)
+    telefono = models.CharField(max_length=30, null=True, default='')
+    correo = models.EmailField(max_length=30, null=True, default='')
+    calle = models.CharField(max_length=50, null=True, default='')
+    colonia = models.CharField(max_length=50, null=True, default='')
+    cuidad = models.CharField(max_length=50, null=True, default='')
+    cp = models.CharField(max_length=10, null=True, default='')
+    estado = models.CharField(max_length=50, null=True, default='')
+    entreCalles = models.CharField(max_length=50, null=True, default='')
     is_main = models.BooleanField(default=False)
 
     class Meta:
@@ -27,7 +28,10 @@ class ClienteInfo(models.Model):
 
 class Carrito(models.Model):
     cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)
-    fecha = models.DateTimeField()
+    fecha = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        get_latest_by = "-fecha"
 
 
 class CarritoInfo(models.Model):

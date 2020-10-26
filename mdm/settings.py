@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'mdm.clients',
     'mdm.orders',
+    'rest_framework'
 ]
 
 MIDDLEWARE = [
