@@ -15,9 +15,10 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path
 from mdm.clients import urls as urls_clientes
-# from mdm.orders import urls as urls_orders
+from mdm.orders import urls as urls_orders
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include(urls_clientes))
+    path('', include(urls_clientes)),
+    path('', include(urls_orders))
 ]

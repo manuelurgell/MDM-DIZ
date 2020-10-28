@@ -10,7 +10,7 @@ class Compra(models.Model):
     calle = models.CharField(max_length=50)
     numero = models.CharField(max_length=50)
     colonia = models.CharField(max_length=50)
-    cuidad = models.CharField(max_length=50)
+    ciudad = models.CharField(max_length=50)
     cp = models.CharField(max_length=10)
     estado = models.CharField(max_length=50)
     entreCalles = models.CharField(max_length=50)
