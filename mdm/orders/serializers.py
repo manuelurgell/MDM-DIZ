@@ -2,7 +2,20 @@ from rest_framework import serializers
 from mdm.orders.models import Compra, Pedido, Factura
 
 
+class PedidoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Pedido
+        fields = [
+            'compra',
+            'codigoProducto',
+            'cantidadProducto',
+            'precioProducto'
+        ]
+
+
 class CompraSerializer(serializers.ModelSerializer):
+    pedido = PedidoSerializer(many=True)
+
     class Meta:
         model = Compra
         fields = [
@@ -16,22 +29,14 @@ class CompraSerializer(serializers.ModelSerializer):
             'ciudad',
             'cp',
             'estado',
-            'entreCalles'
-        ]
-
-
-class PedidoSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Pedido
-        fields = [
-            'compra',
-            'codigoProducto',
-            'cantidadProducto',
-            'precioProducto'
+            'entreCalles',
+            'pedido'
         ]
 
 
 class FacturaSerializer(serializers.ModelSerializer):
+    pedido = PedidoSerializer(many=True)
+
     class Meta:
         model = Factura
         fields = [
@@ -47,5 +52,6 @@ class FacturaSerializer(serializers.ModelSerializer):
             'ciudad',
             'cp',
             'estado',
-            'entreCalles'
+            'entreCalles',
+            'pedido'
         ]

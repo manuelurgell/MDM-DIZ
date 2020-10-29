@@ -29,8 +29,27 @@ class ClienteInfoAdmin(admin.ModelAdmin):
     )
 
 
+class CarritoAdmin(admin.ModelAdmin):
+    model = Carrito
+    list_display = (
+        'cliente_id',
+        'id',
+        'fecha'
+    )
+
+
+class CarritoInfoAdmin(admin.ModelAdmin):
+    model = CarritoInfo
+    list_display = (
+        'carrito_id',
+        'id',
+        'codigoProducto',
+        'cantidadProducto'
+    )
+
+
 # Register tour models here
 admin.site.register(Cliente, ClienteAdmin)
 admin.site.register(ClienteInfo, ClienteInfoAdmin)
-admin.site.register(Carrito)
-admin.site.register(CarritoInfo)
+admin.site.register(Carrito, CarritoAdmin)
+admin.site.register(CarritoInfo, CarritoInfoAdmin)
