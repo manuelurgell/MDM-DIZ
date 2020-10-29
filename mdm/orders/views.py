@@ -67,7 +67,8 @@ class FacturaViewSet(viewsets.ModelViewSet):
         compra = Compra.objects.get(
             id=compra_id
         )
-        factura = Factura.objects.create(
+        pedido = Pedido.objects.filter(compra=compra)
+        Factura.objects.create(
             compra=compra,
             RFC=data["RFC"],
             razonSocial=data["razonSocial"],
@@ -81,8 +82,23 @@ class FacturaViewSet(viewsets.ModelViewSet):
             estado=data["estado"],
             entreCalles=data["entreCalles"]
         )
+        dataFactura = {
+            "compra": compra,
+            "RFC": data["RFC"],
+            "razonSocial": data["razonSocial"],
+            "correo": data["correo"],
+            "telefono": data["telefono"],
+            "calle": data["calle"],
+            "numero": data["numero"],
+            "colonia": data["colonia"],
+            "ciudad": data["ciudad"],
+            "cp": data["cp"],
+            "estado": data["estado"],
+            "entreCalles": data["entreCalles"],
+            "pedido": pedido
+        }
         try:
-            serializer = self.get_serializer(factura)
+            serializer = self.get_serializer(dataFactura)
         except Exception:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
