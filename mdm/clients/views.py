@@ -13,7 +13,6 @@ class ClientViewSet(viewsets.ModelViewSet):
     queryset = Cliente.objects.all()
     serializer_class = serializers.ClienteSerializer
 
-
     def list(self, request, *args, **kwargs):
         return Response(
             data={"Error": "Unauthorized"},
@@ -54,12 +53,6 @@ class ClientViewSet(viewsets.ModelViewSet):
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
-    def destroy(self, request, pk=None):
-        Cliente.objects.filter(id=id).delete()
-
-
-
-
 class ClienteRetrieveView(mixins.ListModelMixin, viewsets.GenericViewSet):
     queryset = Cliente.objects.all()
     serializer_class = serializers.ClienteSerializer
@@ -82,7 +75,9 @@ class ClienteRetrieveView(mixins.ListModelMixin, viewsets.GenericViewSet):
             )
 
 
-class ClienteDeleteView(mixins.ListModelMixin, viewsets.GenericViewSet):
+class ClienteDeleteView(mixins.ListModelMixin,
+                        mixins.CreateModelMixin,
+                        viewsets.GenericViewSet):
     queryset = Cliente.objects.all()
     serializer_class = serializers.ClienteSerializer
 
@@ -96,13 +91,51 @@ class ClienteDeleteView(mixins.ListModelMixin, viewsets.GenericViewSet):
             Cliente.objects.filter(id=cliente_id).delete()
             return Response(
                 data={"Response": "Success"},
-
+                status=status.HTTP_204_NO_CONTENT
             )
         except Exception:
             return Response(
-                data={"Response": "NOT_FOUND"},
+                data={"Response": "Error"},
                 status=status.HTTP_404_NOT_FOUND
             )
+
+    def create(self, request, *args, **kwargs):
+        return Response(data="adding...")
+
+
+class ClienteUpdateView(mixins.ListModelMixin, viewsets.GenericViewSet):
+    queryset = Cliente.objects.all()
+    serializer_class = serializers.ClienteSerializer
+
+    def create(self, request, *args, **kwargs):
+        correoActual = self.request.GET.get('correoActual')
+        try:
+            cliente_id = ClienteInfo.objects.get(
+                correo=correoActual,
+                is_main=True
+            ).cliente.id
+            cliente = Cliente.objects.filter(id=cliente_id)
+            '''dataCliente = {
+
+            }
+            dataClienteInfo = {
+
+            }
+            serializer = serializers.CreateClienteSerializer(
+                cliente,
+                data=data,
+                partial=True
+            )'''
+            return Response(
+                data={"Response": cliente.id},
+                status=status.HTTP_204_NO_CONTENT
+            )
+        except Exception:
+            return Response(
+                data={"Response": "Error"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
 
 class CarritoViewSet(viewsets.GenericViewSet):
     'List, create, retreive, update or delete carritos'
