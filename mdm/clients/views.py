@@ -13,6 +13,7 @@ class ClientViewSet(viewsets.ModelViewSet):
     queryset = Cliente.objects.all()
     serializer_class = serializers.ClienteSerializer
 
+
     def list(self, request, *args, **kwargs):
         return Response(
             data={"Error": "Unauthorized"},
@@ -52,8 +53,11 @@ class ClientViewSet(viewsets.ModelViewSet):
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
-    def retrieve(self, request, pk=None):
-        return Response(pk)
+
+    def destroy(self, request, pk=None):
+        Cliente.objects.filter(id=id).delete()
+
+
 
 
 class ClienteRetrieveView(mixins.ListModelMixin, viewsets.GenericViewSet):
@@ -77,6 +81,28 @@ class ClienteRetrieveView(mixins.ListModelMixin, viewsets.GenericViewSet):
                 status=status.HTTP_404_NOT_FOUND
             )
 
+
+class ClienteDeleteView(mixins.ListModelMixin, viewsets.GenericViewSet):
+    queryset = Cliente.objects.all()
+    serializer_class = serializers.ClienteSerializer
+
+    def list(self, request, *args, **kwargs):
+        correo = self.request.GET.get('correo')
+        try:
+            cliente_id = ClienteInfo.objects.get(
+                correo=correo,
+                is_main=True
+            ).cliente.id
+            Cliente.objects.filter(id=cliente_id).delete()
+            return Response(
+                data={"Response": "Success"},
+
+            )
+        except Exception:
+            return Response(
+                data={"Response": "NOT_FOUND"},
+                status=status.HTTP_404_NOT_FOUND
+            )
 
 class CarritoViewSet(viewsets.GenericViewSet):
     'List, create, retreive, update or delete carritos'
