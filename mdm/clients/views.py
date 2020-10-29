@@ -61,8 +61,21 @@ class ClienteRetrieveView(mixins.ListModelMixin, viewsets.GenericViewSet):
     serializer_class = serializers.ClienteSerializer
 
     def list(self, request, *args, **kwargs):
-        email = self.request.GET.get('email')
-        return Response(email)
+        correo = self.request.GET.get('correo')
+        try:
+            cliente_id = ClienteInfo.objects.get(
+                correo=correo,
+                is_main=True
+            ).cliente.id
+            return Response(
+                data={"Response": cliente_id},
+                status=status.HTTP_302_FOUND
+            )
+        except Exception:
+            return Response(
+                data={"Response": "NOT_FOUND"},
+                status=status.HTTP_404_NOT_FOUND
+            )
 
 
 class CarritoViewSet(viewsets.GenericViewSet):
