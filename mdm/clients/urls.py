@@ -9,6 +9,10 @@ router.register(
     views.ClienteRetrieveView
 )
 router.register(r'clients', views.ClientViewSet)
+router.register(
+    r'carritos/get',
+    views.CarritoRetrieveView
+)
 router.register(r'carritos', views.CarritoViewSet)
 
 urlpatterns = [

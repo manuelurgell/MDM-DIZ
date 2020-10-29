@@ -89,13 +89,16 @@ class CarritoViewSet(viewsets.GenericViewSet):
             status=status.HTTP_401_UNAUTHORIZED
         )
 
+    def delete(self, cliente):
+        Carrito.objects.filter(cliente_id=cliente.id).delete()
+
     def create(self, request, *args, **kwargs):
         correo = request.data.get('carrito')["correo"]
         cliente = ClienteInfo.objects.get(
             correo=correo,
             is_main=True
         ).cliente
-
+        self.delete(cliente)
         try:
             carrito = Carrito.objects.create(
                 cliente=cliente
@@ -122,3 +125,30 @@ class CarritoViewSet(viewsets.GenericViewSet):
                 return Response(data="1", status=status.HTTP_400_BAD_REQUEST)
         except Exception:
             return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+class CarritoRetrieveView(mixins.ListModelMixin, viewsets.GenericViewSet):
+    queryset = Carrito.objects.all()
+    serializer_class = serializers.CarritoSerializer
+
+    def list(self, request, *args, **kwargs):
+        correo = self.request.GET.get('correo')
+        try:
+            cliente = ClienteInfo.objects.get(
+                correo=correo,
+                is_main=True
+            ).cliente
+
+            carrito = Carrito.objects.get(cliente=cliente)
+
+            serializer = self.get_serializer(carrito)
+
+            return Response(
+                data=serializer.data,
+                status=status.HTTP_302_FOUND
+            )
+        except Exception:
+            return Response(
+                data={"Response": "NOT_FOUND"},
+                status=status.HTTP_404_NOT_FOUND
+            )

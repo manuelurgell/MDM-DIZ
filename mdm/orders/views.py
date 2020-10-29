@@ -40,7 +40,7 @@ class CompraViewSet(viewsets.ModelViewSet):
                     codigoProducto=dataPedido["codigoProducto"],
                     cantidadProducto=dataPedido["cantidadProducto"],
                     precioProducto=dataPedido["precioProducto"]
-                ).save()
+                )
             except Exception:
                 Compra.objects.filter(id=compra.id).delete()
                 return Response(status=status.HTTP_400_BAD_REQUEST)
