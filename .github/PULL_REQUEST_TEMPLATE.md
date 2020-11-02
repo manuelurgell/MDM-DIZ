@@ -19,3 +19,4 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam vestibulum rhoncu
 
 ### Tests
 * Run tests with tox
+* Add screenshot:
