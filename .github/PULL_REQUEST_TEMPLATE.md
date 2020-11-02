@@ -16,9 +16,11 @@ Lorem ipsum dolor sit amet.
 ### Prove
 
 * Add screenshot:
+
 HERE
 
 ### Tests
 * Run tests with tox
 * Add screenshot:
+
 HERE
