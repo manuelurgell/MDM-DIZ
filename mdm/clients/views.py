@@ -103,31 +103,26 @@ class ClienteDeleteView(mixins.ListModelMixin,
         return Response(data="adding...")
 
 
-class ClienteUpdateView(mixins.ListModelMixin, viewsets.GenericViewSet):
+class ClienteUpdateView(viewsets.GenericViewSet):
     queryset = Cliente.objects.all()
     serializer_class = serializers.ClienteSerializer
 
     def create(self, request, *args, **kwargs):
-        correoActual = self.request.GET.get('correoActual')
+        correoActual = self.request.GET.get('correo')
+        print(correoActual)
         try:
             cliente_id = ClienteInfo.objects.get(
                 correo=correoActual,
                 is_main=True
             ).cliente.id
             cliente = Cliente.objects.filter(id=cliente_id)
-            '''dataCliente = {
-
-            }
-            dataClienteInfo = {
-
-            }
             serializer = serializers.CreateClienteSerializer(
                 cliente,
-                data=data,
+                data=self.request.data.get('cliente'),
                 partial=True
-            )'''
+            )
             return Response(
-                data={"Response": cliente.id},
+                data={"Response": serializer.data},
                 status=status.HTTP_204_NO_CONTENT
             )
         except Exception:
