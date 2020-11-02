@@ -7,16 +7,18 @@
 
 ### Description
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam vestibulum rhoncus dui, sed eleifend libero ornare sed. Quisque molestie et velit at lobortis.
+Lorem ipsum dolor sit amet.
 
 ### Motivation and context
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam vestibulum rhoncus dui, sed eleifend libero ornare sed. Quisque molestie et velit at lobortis.
+Lorem ipsum dolor sit amet.
 
 ### Prove
 
 * Add screenshot:
+HERE
 
 ### Tests
 * Run tests with tox
 * Add screenshot:
+HERE
