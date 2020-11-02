@@ -3,19 +3,19 @@
 - [ ] Small bug fix (non-breaking change which fixes an issue)
 - [ ] New feature (non-breaking change which adds new functionality)
 - [ ] Breaking change (fix or feature that would change existing functionality)
-- [ ] Deploy to staging (Merge from `dev` to `staging`)
-- [ ] Release stable version (Merge from `staging` to `master`)
+- [ ] Release stable version (Ready to deply on GCP)
 
 ### Description
 
-Removing sales in quota from xplor score formula
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam vestibulum rhoncus dui, sed eleifend libero ornare sed. Quisque molestie et velit at lobortis.
 
 ### Motivation and context
 
-The `sale` property in bimbo data is rounding by quota, so was necessary parse it to pieces.
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam vestibulum rhoncus dui, sed eleifend libero ornare sed. Quisque molestie et velit at lobortis.
+
+### Prove
+
+* Add screenshot:
 
 ### Tests
-
-* Run tests with `make run-tests`
-* Open the view where the sales are shown
-* Add screenshot:
+* Run tests with tox
