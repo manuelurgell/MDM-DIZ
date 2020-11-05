@@ -5,6 +5,9 @@ from rest_framework import status, viewsets, mixins
 # from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 
+from django.core.validators import validate_email
+from django.core.exceptions import ValidationError
+
 # Create your views here
 
 
@@ -13,12 +16,20 @@ class ClientViewSet(viewsets.ModelViewSet):
     queryset = Cliente.objects.all()
     serializer_class = serializers.ClienteSerializer
 
-
     def list(self, request, *args, **kwargs):
         return Response(
             data={"Error": "Unauthorized"},
             status=status.HTTP_401_UNAUTHORIZED
         )
+
+    def ValidateEmail(self, email):
+        # print(email)
+        try:
+            validate_email(email)
+            valid_email = True
+        except ValidationError:
+            valid_email = False
+        return valid_email
 
     def create(self, request, *args, **kwargs):
         dataCliente = request.data.get('cliente')
@@ -28,39 +39,41 @@ class ClientViewSet(viewsets.ModelViewSet):
         if serializer_cliente.is_valid():
             cliente = serializer_cliente.save()
             dataClienteInfo = request.data.get('clienteInfo')
+            email = dataClienteInfo["correo"]
+            check = self.ValidateEmail(email)
+            if check:
+                try:
+                    ClienteInfo.objects.create(
+                        cliente=cliente,
+                        telefono=dataClienteInfo["telefono"],
+                        correo=dataClienteInfo["correo"],
+                        is_main=True
+                    )
+                except Exception:
+                    Cliente.objects.filter(id=cliente.id).delete()
+                    return Response(status=status.HTTP_400_BAD_REQUEST)
 
-            try:
-                ClienteInfo.objects.create(
-                    cliente=cliente,
-                    telefono=dataClienteInfo["telefono"],
-                    correo=dataClienteInfo["correo"],
-                    is_main=True
+                serializer = self.get_serializer(
+                    cliente
                 )
-            except Exception:
+
+                return Response(
+                    # data={"response": "Success"},
+                    data=serializer.data,
+                    status=status.HTTP_201_CREATED
+                )
+            else:
                 Cliente.objects.filter(id=cliente.id).delete()
-                return Response(status=status.HTTP_400_BAD_REQUEST)
-
-            serializer = self.get_serializer(
-                cliente
-            )
-
-            return Response(
-                # data={"response": "Success"},
-                data=serializer.data,
-                status=status.HTTP_201_CREATED
-            )
-
+                return Response(
+                    data={"Response": "NOT AN EMAIL"},
+                    status=status.HTTP_406_NOT_ACCEPTABLE
+                )
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
-    def destroy(self, request, pk=None):
-        Cliente.objects.filter(id=id).delete()
-
-
-
-
 class ClienteRetrieveView(mixins.ListModelMixin, viewsets.GenericViewSet):
+
     queryset = Cliente.objects.all()
     serializer_class = serializers.ClienteSerializer
 
@@ -103,6 +116,7 @@ class ClienteDeleteView(mixins.ListModelMixin, viewsets.GenericViewSet):
                 data={"Response": "NOT_FOUND"},
                 status=status.HTTP_404_NOT_FOUND
             )
+
 
 class CarritoViewSet(viewsets.GenericViewSet):
     'List, create, retreive, update or delete carritos'
