@@ -9,6 +9,7 @@ class Cliente(models.Model):
     fechaNac = models.DateField()
     genero = models.CharField(max_length=30)
     created = models.DateTimeField(auto_now_add=True)
+   
 
 
 class ClienteInfo(models.Model):

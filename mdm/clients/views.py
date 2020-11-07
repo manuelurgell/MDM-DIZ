@@ -13,7 +13,6 @@ from phonenumbers.phonenumberutil import region_code_for_number
 
 # Create your views here
 
-
 class ClientViewSet(viewsets.ModelViewSet):
     '''List, create, retrieve, update, partial_update or delete clientes'''
     queryset = Cliente.objects.all()

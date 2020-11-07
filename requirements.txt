@@ -10,5 +10,5 @@ pyflakes==2.2.0
 pytz==2020.1
 sqlparse==0.4.1
 django-phonenumber-field==5.0.0
-phonenumbers==8.12.12
+phonenumber==8.12.12
 
