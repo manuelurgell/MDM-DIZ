@@ -42,7 +42,7 @@ class ClientViewSet(viewsets.ModelViewSet):
                 phone = '+'+phone
                 parse = phonenumbers.parse(phone)
                 region = region_code_for_number(parse)
-                cel = phonenumbers.parse(phone, region)          
+                cel = phonenumbers.parse(phone, region)
             print(cel)
             valid_phone = phonenumbers.is_possible_number(cel)
             print(bool(valid_phone))
@@ -89,12 +89,12 @@ class ClientViewSet(viewsets.ModelViewSet):
                 )
             else:
                 Cliente.objects.filter(id=cliente.id).delete()
-                if not check and not check2: 
+                if not check and not check2:
                     return Response(
                         data={"Response": "NOT A CORRECT PHONE AND NOT AN EMAIL"},
                         status=status.HTTP_406_NOT_ACCEPTABLE
                     )
-                if not check:                    
+                if not check:
                     return Response(
                         data={"Response": "NOT A CORRECT PHONE"},
                         status=status.HTTP_406_NOT_ACCEPTABLE
@@ -131,7 +131,9 @@ class ClienteRetrieveView(mixins.ListModelMixin, viewsets.GenericViewSet):
             )
 
 
-class ClienteDeleteView(mixins.ListModelMixin, viewsets.GenericViewSet):
+class ClienteDeleteView(mixins.ListModelMixin,
+                        mixins.CreateModelMixin,
+                        viewsets.GenericViewSet):
     queryset = Cliente.objects.all()
     serializer_class = serializers.ClienteSerializer
 
@@ -145,11 +147,43 @@ class ClienteDeleteView(mixins.ListModelMixin, viewsets.GenericViewSet):
             Cliente.objects.filter(id=cliente_id).delete()
             return Response(
                 data={"Response": "Success"},
-
+                status=status.HTTP_204_NO_CONTENT
             )
         except Exception:
             return Response(
-                data={"Response": "NOT_FOUND"},
+                data={"Response": "Error"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+    def create(self, request, *args, **kwargs):
+        return Response(data="adding...")
+
+
+class ClienteUpdateView(viewsets.GenericViewSet):
+    queryset = Cliente.objects.all()
+    serializer_class = serializers.ClienteSerializer
+
+    def create(self, request, *args, **kwargs):
+        correoActual = self.request.GET.get('correo')
+        print(correoActual)
+        try:
+            cliente_id = ClienteInfo.objects.get(
+                correo=correoActual,
+                is_main=True
+            ).cliente.id
+            cliente = Cliente.objects.filter(id=cliente_id)
+            serializer = serializers.CreateClienteSerializer(
+                cliente,
+                data=self.request.data.get('cliente'),
+                partial=True
+            )
+            return Response(
+                data={"Response": serializer.data},
+                status=status.HTTP_204_NO_CONTENT
+            )
+        except Exception:
+            return Response(
+                data={"Response": "Error"},
                 status=status.HTTP_404_NOT_FOUND
             )
 

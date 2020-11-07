@@ -12,6 +12,10 @@ router.register(
     r'clients/delete',
     views.ClienteDeleteView
 )
+router.register(
+    r'clients/update',
+    views.ClienteUpdateView
+)
 router.register(r'clients', views.ClientViewSet)
 router.register(
     r'carritos/get',
