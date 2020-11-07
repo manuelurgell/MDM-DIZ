@@ -11,6 +11,10 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
 from pathlib import Path
+# Para que funcione para Xime
+import pymysql
+pymysql.version_info = (1, 4, 2, "final", 0)
+pymysql.install_as_MySQLdb()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -39,7 +43,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'mdm.clients',
     'mdm.orders',
-    'rest_framework'
+    'rest_framework',
+    'phonenumber_field'
 ]
 
 MIDDLEWARE = [
@@ -125,6 +130,8 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
+
+PHONENUMBER_DB_FORMAT = 'NATIONAL'
 
 
 # Static files (CSS, JavaScript, Images)

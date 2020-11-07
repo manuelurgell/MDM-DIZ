@@ -1,4 +1,5 @@
 from django.db import models
+from phonenumber_field.modelfields import PhoneNumberField
 
 
 class Cliente(models.Model):
@@ -16,8 +17,8 @@ class ClienteInfo(models.Model):
         on_delete=models.CASCADE,
         related_name='clienteInfo'
     )
-    telefono = models.CharField(
-        max_length=30, null=True, blank=True, default=''
+    telefono = PhoneNumberField(
+        max_length=12, null=True, blank=True, default=''
     )
     correo = models.EmailField(
         max_length=30, null=True, blank=True, default=''
