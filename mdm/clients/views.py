@@ -133,10 +133,13 @@ class ClienteRetrieveView(mixins.ListModelMixin, viewsets.GenericViewSet):
             for clienteInfo in clientesInfo:
                 cliente = clienteInfo.cliente
                 if not cliente.is_deleted:
-                    break
+                    return Response(
+                        data={"Response": cliente.id},
+                        status=status.HTTP_302_FOUND
+                    )
             return Response(
-                data={"Response": cliente.id},
-                status=status.HTTP_302_FOUND
+                data={"Response": "NOT_FOUND"},
+                status=status.HTTP_404_NOT_FOUND
             )
         except Exception:
             return Response(
