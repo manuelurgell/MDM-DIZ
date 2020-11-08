@@ -14,7 +14,8 @@ class ClienteAdmin(admin.ModelAdmin):
         'id',
         'nombrePila',
         'apellidoPat',
-        'created'
+        'created',
+        'is_deleted'
     )
 
 

@@ -125,20 +125,19 @@ class ClienteRetrieveView(mixins.ListModelMixin, viewsets.GenericViewSet):
     def list(self, request, *args, **kwargs):
         correo = self.request.GET.get('correo')
         try:
-            cliente = ClienteInfo.objects.get(
+            clientesInfo = ClienteInfo.objects.filter(
                 correo=correo,
                 is_main=True
-            ).cliente
-            if not cliente.is_deleted:
-                return Response(
-                    data={"Response": cliente.id},
-                    status=status.HTTP_302_FOUND
-                )
-            else:
-                return Response(
-                    data={"Response": "NOT_FOUND"},
-                    status=status.HTTP_404_NOT_FOUND
-                )
+            )
+            cliente = Cliente.objects
+            for clienteInfo in clientesInfo:
+                cliente = clienteInfo.cliente
+                if not cliente.is_deleted:
+                    break
+            return Response(
+                data={"Response": cliente.id},
+                status=status.HTTP_302_FOUND
+            )
         except Exception:
             return Response(
                 data={"Response": "NOT_FOUND"},
