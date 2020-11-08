@@ -16,12 +16,6 @@ class ClientViewSet(viewsets.ModelViewSet):
     queryset = Cliente.objects.all()
     serializer_class = serializers.ClienteSerializer
 
-    def list(self, request, *args, **kwargs):
-        return Response(
-            data={"Error": "Unauthorized"},
-            status=status.HTTP_401_UNAUTHORIZED
-        )
-
     def ValidateEmail(self, email):
         # print(email)
         try:
@@ -30,6 +24,12 @@ class ClientViewSet(viewsets.ModelViewSet):
         except ValidationError:
             valid_email = False
         return valid_email
+
+    def list(self, request, *args, **kwargs):
+        return Response(
+            data={"Error": "Unauthorized"},
+            status=status.HTTP_401_UNAUTHORIZED
+        )
 
     def create(self, request, *args, **kwargs):
         dataCliente = request.data.get('cliente')
@@ -71,6 +71,51 @@ class ClientViewSet(viewsets.ModelViewSet):
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
+    def retrieve(self, request, *args, **kwargs):
+        try:
+            cliente = self.get_object()
+            if not cliente.is_deleted:
+                serializer = self.get_serializer(cliente)
+                data = serializer.data
+            else:
+                return Response(
+                    data={"Response": "NOT_FOUND"},
+                    status=status.HTTP_404_NOT_FOUND
+                )
+        except Exception:
+            return Response(
+                data={"Response": "NOT_FOUND"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        return Response(
+            data=data,
+            status=status.HTTP_301_MOVED_PERMANENTLY
+        )
+
+    def destroy(self, request, *args, **kwargs):
+        # self.perform_destroy(cliente)
+        try:
+            cliente = self.get_object()
+            if not cliente.is_deleted:
+                cliente.is_deleted = True
+                cliente.save()
+                serializer = self.get_serializer(cliente)
+                data = serializer.data
+            else:
+                return Response(
+                    data={"Response": "NOT_FOUND"},
+                    status=status.HTTP_404_NOT_FOUND
+                )
+        except Exception:
+            return Response(
+                data={"Response": "NOT_FOUND"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        return Response(
+            data=data,
+            status=status.HTTP_301_MOVED_PERMANENTLY
+        )
+
 
 class ClienteRetrieveView(mixins.ListModelMixin, viewsets.GenericViewSet):
 
@@ -80,47 +125,25 @@ class ClienteRetrieveView(mixins.ListModelMixin, viewsets.GenericViewSet):
     def list(self, request, *args, **kwargs):
         correo = self.request.GET.get('correo')
         try:
-            cliente_id = ClienteInfo.objects.get(
+            cliente = ClienteInfo.objects.get(
                 correo=correo,
                 is_main=True
-            ).cliente.id
-            return Response(
-                data={"Response": cliente_id},
-                status=status.HTTP_302_FOUND
-            )
+            ).cliente
+            if not cliente.is_deleted:
+                return Response(
+                    data={"Response": cliente.id},
+                    status=status.HTTP_302_FOUND
+                )
+            else:
+                return Response(
+                    data={"Response": "NOT_FOUND"},
+                    status=status.HTTP_404_NOT_FOUND
+                )
         except Exception:
             return Response(
                 data={"Response": "NOT_FOUND"},
                 status=status.HTTP_404_NOT_FOUND
             )
-
-
-class ClienteDeleteView(mixins.ListModelMixin,
-                        mixins.CreateModelMixin,
-                        viewsets.GenericViewSet):
-    queryset = Cliente.objects.all()
-    serializer_class = serializers.ClienteSerializer
-
-    def list(self, request, *args, **kwargs):
-        correo = self.request.GET.get('correo')
-        try:
-            cliente_id = ClienteInfo.objects.get(
-                correo=correo,
-                is_main=True
-            ).cliente.id
-            Cliente.objects.filter(id=cliente_id).delete()
-            return Response(
-                data={"Response": "Success"},
-                status=status.HTTP_204_NO_CONTENT
-            )
-        except Exception:
-            return Response(
-                data={"Response": "Error"},
-                status=status.HTTP_404_NOT_FOUND
-            )
-
-    def create(self, request, *args, **kwargs):
-        return Response(data="adding...")
 
 
 class ClienteUpdateView(viewsets.GenericViewSet):

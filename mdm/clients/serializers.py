@@ -34,19 +34,17 @@ class ClienteInfoSerializer(serializers.ModelSerializer):
 
 class ClienteSerializer(serializers.ModelSerializer):
     clienteInfo = ClienteInfoSerializer(many=True)
-    # clienteinfo_set = serializers.PrimaryKeyRelatedField(
-    #     many=True,
-    #     read_only=True
-    # )
 
     class Meta:
         model = Cliente
         fields = [
+            'id',
             'nombrePila',
             'apellidoPat',
             'apellidoMat',
             'fechaNac',
             'genero',
+            'is_deleted',
             'clienteInfo'
         ]
 

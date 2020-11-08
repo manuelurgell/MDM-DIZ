@@ -9,10 +9,6 @@ router.register(
     views.ClienteRetrieveView
 )
 router.register(
-    r'clients/delete',
-    views.ClienteDeleteView
-)
-router.register(
     r'clients/update',
     views.ClienteUpdateView
 )
