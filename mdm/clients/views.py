@@ -7,6 +7,8 @@ from rest_framework.response import Response
 
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
+import phonenumbers
+from phonenumbers.phonenumberutil import region_code_for_number
 
 # Create your views here
 
@@ -25,6 +27,22 @@ class ClientViewSet(viewsets.ModelViewSet):
             valid_email = False
         return valid_email
 
+    def ValidatePhone(self, phone):
+        try:
+            if len(phone) == 10:
+                cel = phonenumbers.parse(phone, "MX")
+            else:
+                phone = '+'+phone
+                parse = phonenumbers.parse(phone)
+                region = region_code_for_number(parse)
+                cel = phonenumbers.parse(phone, region)
+            print(cel)
+            valid_phone = phonenumbers.is_possible_number(cel)
+            valid_phone = phonenumbers.is_valid_number(cel)
+        except Exception:
+            valid_phone = False
+        return valid_phone
+
     def list(self, request, *args, **kwargs):
         return Response(
             data={"Error": "Unauthorized"},
@@ -39,9 +57,11 @@ class ClientViewSet(viewsets.ModelViewSet):
         if serializer_cliente.is_valid():
             cliente = serializer_cliente.save()
             dataClienteInfo = request.data.get('clienteInfo')
+            phone = dataClienteInfo["telefono"]
+            check = self.ValidatePhone(phone)
             email = dataClienteInfo["correo"]
-            check = self.ValidateEmail(email)
-            if check:
+            check2 = self.ValidateEmail(email)
+            if check and check2:
                 try:
                     ClienteInfo.objects.create(
                         cliente=cliente,
@@ -64,10 +84,23 @@ class ClientViewSet(viewsets.ModelViewSet):
                 )
             else:
                 Cliente.objects.filter(id=cliente.id).delete()
-                return Response(
-                    data={"Response": "NOT AN EMAIL"},
-                    status=status.HTTP_406_NOT_ACCEPTABLE
-                )
+                if not check and not check2:
+                    return Response(
+                        data={
+                            "Response": "NOT A CORRECT PHONE AND NOT AN EMAIL"
+                        },
+                        status=status.HTTP_406_NOT_ACCEPTABLE
+                    )
+                if not check:
+                    return Response(
+                        data={"Response": "NOT A CORRECT PHONE"},
+                        status=status.HTTP_406_NOT_ACCEPTABLE
+                    )
+                else:
+                    return Response(
+                        data={"Response": "NOT AN EMAIL"},
+                        status=status.HTTP_406_NOT_ACCEPTABLE
+                    )
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
