@@ -89,7 +89,7 @@ class ClientViewSet(viewsets.ModelViewSet):
             )
         return Response(
             data=data,
-            status=status.HTTP_301_MOVED_PERMANENTLY
+            status=status.HTTP_302_FOUND
         )
 
     def destroy(self, request, *args, **kwargs):
