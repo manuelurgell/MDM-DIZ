@@ -1,11 +1,15 @@
 asgiref==3.2.10
 Django==3.1.2
+django-phonenumber-field==5.0.0
 djangorestframework==3.12.1
 flake8==3.8.4
-gunicorn==19.9.0
 mccabe==0.6.1
-mysqlclient==2.0.1
+mysql-connector-python==8.0.22
+phonenumbers==8.12.12
+protobuf==4.0.0rc2
 pycodestyle==2.6.0
 pyflakes==2.2.0
+PyMySQL==0.10.1
 pytz==2020.1
+six==1.15.0
 sqlparse==0.4.1
