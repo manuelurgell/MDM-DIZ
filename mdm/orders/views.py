@@ -12,6 +12,42 @@ class CompraViewSet(viewsets.ModelViewSet):
     queryset = Compra.objects.all()
     serializer_class = serializers.CompraSerializer
 
+    def evenDigits(self, card, length, end):
+        sum = 0
+        for i in range(length-2, end, -2):
+            number = eval(card[i])
+            number = number * 2
+            if number > 9:
+                strNumber = str(number)
+                number = eval(strNumber[0]) + eval(strNumber[1])
+            sum += number
+        return sum
+
+    def oddDigits(self, card, length, end):
+        sumOdd = 0
+        print("impares")
+        for i in range(length-3, end, -2):
+            sumOdd += eval(card[i])
+        return sumOdd
+
+    def card_luhn(self, card):
+        length = len(card)
+        if length == 16:
+            sumEven = self.evenDigits(card, length, -1)
+            sumOdd = self.oddDigits(card, length, 0)
+            total = sumEven + sumOdd + int(card[15])
+            if total % 10 == 0:
+                return True
+        elif length == 15:
+            sumEven = self.evenDigits(card, length, 0)
+            sumOdd = self.oddDigits(card, length, -1)
+            total = sumEven + sumOdd + int(card[14])
+            if total % 10 == 0:
+                return True
+
+        else:
+            return False
+
     def create(self, request, *args, **kwargs):
         dataCompra = request.data.get('compra')
         correo = dataCompra["correo"]
@@ -19,41 +55,48 @@ class CompraViewSet(viewsets.ModelViewSet):
             correo=correo,
             is_main=True
         ).cliente
-        try:
-            compra = Compra.objects.create(
-                cliente=cliente,
-                noTarjeta=dataCompra["noTarjeta"],
-                total=dataCompra["total"],
-                calle=dataCompra["calle"],
-                numero=dataCompra["numero"],
-                colonia=dataCompra["colonia"],
-                ciudad=dataCompra["ciudad"],
-                cp=dataCompra["cp"],
-                estado=dataCompra["estado"],
-                entreCalles=dataCompra["entreCalles"]
-            )
+        tarjeta = dataCompra["noTarjeta"]
+        validateCard = self.card_luhn(tarjeta)
+        if validateCard:
             try:
-                dataPedido = request.data.get('pedido')
-
-                Pedido.objects.create(
-                    compra=compra,
-                    codigoProducto=dataPedido["codigoProducto"],
-                    cantidadProducto=dataPedido["cantidadProducto"],
-                    precioProducto=dataPedido["precioProducto"]
+                compra = Compra.objects.create(
+                    cliente=cliente,
+                    noTarjeta=dataCompra["noTarjeta"],
+                    total=dataCompra["total"],
+                    calle=dataCompra["calle"],
+                    numero=dataCompra["numero"],
+                    colonia=dataCompra["colonia"],
+                    ciudad=dataCompra["ciudad"],
+                    cp=dataCompra["cp"],
+                    estado=dataCompra["estado"],
+                    entreCalles=dataCompra["entreCalles"]
                 )
+                try:
+                    dataPedido = request.data.get('pedido')
+
+                    Pedido.objects.create(
+                        compra=compra,
+                        codigoProducto=dataPedido["codigoProducto"],
+                        cantidadProducto=dataPedido["cantidadProducto"],
+                        precioProducto=dataPedido["precioProducto"]
+                    )
+                except Exception:
+                    Compra.objects.filter(id=compra.id).delete()
+                    return Response(status=status.HTTP_400_BAD_REQUEST)
             except Exception:
-                Compra.objects.filter(id=compra.id).delete()
                 return Response(status=status.HTTP_400_BAD_REQUEST)
-        except Exception:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+            serializer = self.get_serializer(compra)
 
-        serializer = self.get_serializer(compra)
-
-        return Response(
-            # data={"response": "Success"},
-            data=serializer.data,
-            status=status.HTTP_201_CREATED
-        )
+            return Response(
+                # data={"response": "Success"},
+                data=serializer.data,
+                status=status.HTTP_201_CREATED
+            )
+        else:
+            return Response(
+                data={"Response": "CARD_NOT_VALID"},
+                status=status.HTTP_406_NOT_ACCEPTABLE
+            )
 
 
 class FacturaViewSet(viewsets.ModelViewSet):
