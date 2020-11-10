@@ -1,4 +1,4 @@
-from mdm.clients.models import Carrito, CarritoInfo, Cliente, ClienteInfo
+from mdm.clients.models import Carrito, CarritoInfo, Cliente, ClienteInfo, Exceptions
 from mdm.clients import serializers
 
 from rest_framework import status, viewsets, mixins
@@ -10,6 +10,8 @@ from django.core.exceptions import ValidationError
 import phonenumbers
 from phonenumbers.phonenumberutil import region_code_for_number
 
+import re
+
 # Create your views here
 
 
@@ -17,6 +19,16 @@ class ClientViewSet(viewsets.ModelViewSet):
     '''List, create, retrieve, update, partial_update or delete clientes'''
     queryset = Cliente.objects.all()
     serializer_class = serializers.ClienteSerializer
+
+    def ValidateName(self, clientName):
+        try:
+            Exceptions.objects.get(nombre=clientName)
+            return True
+        except Exceptions.DoesNotExist:
+            return bool(
+                re.match(
+                    '^[^0-9_!¡?÷?¿/\\+=@#$%ˆ&*(){}|~<>;:[\]]{2,}$', clientName)
+                        )
 
     def ValidateEmail(self, email):
         # print(email)
@@ -57,11 +69,13 @@ class ClientViewSet(viewsets.ModelViewSet):
         if serializer_cliente.is_valid():
             cliente = serializer_cliente.save()
             dataClienteInfo = request.data.get('clienteInfo')
+            clientName = dataCliente["nombrePila"]
+            validName = self.ValidateName(clientName)
             phone = dataClienteInfo["telefono"]
             check = self.ValidatePhone(phone)
             email = dataClienteInfo["correo"]
             check2 = self.ValidateEmail(email)
-            if check and check2:
+            if check and check2 and validName:
                 try:
                     ClienteInfo.objects.create(
                         cliente=cliente,
@@ -84,6 +98,13 @@ class ClientViewSet(viewsets.ModelViewSet):
                 )
             else:
                 Cliente.objects.filter(id=cliente.id).delete()
+                if not validName:
+                    return Response(
+                        data={
+                            "Response": "NOT A CORRECT NAME"
+                        },
+                        status=status.HTTP_406_NOT_ACCEPTABLE
+                    )
                 if not check and not check2:
                     return Response(
                         data={
