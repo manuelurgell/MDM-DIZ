@@ -5,6 +5,8 @@ from mdm.orders import serializers
 from rest_framework import status, viewsets
 from rest_framework.response import Response
 
+import datetime
+
 
 # Create your views here.
 class CompraViewSet(viewsets.ModelViewSet):
@@ -47,6 +49,24 @@ class CompraViewSet(viewsets.ModelViewSet):
 
         else:
             return False
+    def expired_card(self, monthC, yearC):
+        print('chequeo de tarjetas')
+        currentYear = datetime.datetime.today().year
+        currentMonth = datetime.datetime.today().month
+        strYear = str(currentYear)
+        year = strYear[0] + strYear[1]
+        print(year)
+        print(currentMonth)
+        if monthC > currentMonth and yearC >= int(year):
+            print('buena')
+            return True
+        elif monthC <= currentMonth and yearC > int(year):
+            print('buena')
+            return True
+        else:
+            print('vencida')
+            return False
+
 
     def create(self, request, *args, **kwargs):
         dataCompra = request.data.get('compra')
@@ -57,11 +77,16 @@ class CompraViewSet(viewsets.ModelViewSet):
         ).cliente
         tarjeta = dataCompra["noTarjeta"]
         validateCard = self.card_luhn(tarjeta)
-        if validateCard:
+        mesT = int(dataCompra["mesTarjeta"])
+        anioT = int(dataCompra["anioTarjeta"])
+        checkExpired = self.expired_card(mesT, anioT)
+        if validateCard and checkExpired:
             try:
                 compra = Compra.objects.create(
                     cliente=cliente,
                     noTarjeta=dataCompra["noTarjeta"],
+                    mesTarjeta=dataCompra["mesTarjeta"],
+                    anioTarjeta=dataCompra["anioTarjeta"],
                     total=dataCompra["total"],
                     calle=dataCompra["calle"],
                     numero=dataCompra["numero"],
@@ -93,10 +118,21 @@ class CompraViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_201_CREATED
             )
         else:
-            return Response(
-                data={"Response": "CARD_NOT_VALID"},
-                status=status.HTTP_406_NOT_ACCEPTABLE
-            )
+            if not checkExpired and not validateCard:
+                return Response(
+                    data={"Response": "CARD NOT VALID AND EXPIRED"},
+                    status=status.HTTP_406_NOT_ACCEPTABLE
+                )
+            elif not checkExpired:
+                return Response(
+                    data={"Response": "EXPIRED_CARD"},
+                    status=status.HTTP_406_NOT_ACCEPTABLE
+                )
+            else:
+                return Response(
+                    data={"Response": "CARD_NOT_VALID"},
+                    status=status.HTTP_406_NOT_ACCEPTABLE
+                )
 
 
 class FacturaViewSet(viewsets.ModelViewSet):
