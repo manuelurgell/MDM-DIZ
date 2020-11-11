@@ -2,6 +2,10 @@ from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
 
 
+class Exceptions(models.Model):
+    nombre = models.CharField(max_length=50)
+
+
 class Cliente(models.Model):
     nombrePila = models.CharField(max_length=30)
     apellidoPat = models.CharField(max_length=30)
