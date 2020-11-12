@@ -55,7 +55,7 @@ class CompraViewSet(viewsets.ModelViewSet):
         currentYear = datetime.datetime.today().year
         currentMonth = datetime.datetime.today().month
         strYear = str(currentYear)
-        year = strYear[0] + strYear[1]
+        year = strYear[2] + strYear[3]
         print(year)
         print(currentMonth)
         if monthC > currentMonth and yearC >= int(year):

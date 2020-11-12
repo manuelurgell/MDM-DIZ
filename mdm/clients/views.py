@@ -61,9 +61,12 @@ class ClientViewSet(viewsets.ModelViewSet):
 
     def Duplicate(self, email):
         try:
-            ClienteInfo.objects.get(correo=email)
+            cliente = ClienteInfo.objects.get(correo=email).cliente
+            Cliente.objects.get(id=cliente.id, is_deleted=False)
             duplicate = False
         except ClienteInfo.DoesNotExist:
+            duplicate = True
+        except Cliente.DoesNotExist:
             duplicate = True
         return duplicate
 
@@ -73,7 +76,8 @@ class ClientViewSet(viewsets.ModelViewSet):
                 nombrePila=clientName,
                 apellidoPat=clientLast,
                 fechaNac=birth,
-                genero=gender
+                genero=gender,
+                is_deleted=False
             )
             temporaryId = temporaryClient.id
         except Cliente.DoesNotExist:
@@ -109,7 +113,8 @@ class ClientViewSet(viewsets.ModelViewSet):
                 )
                 if duplicateName != "0":
                     existingClientInfo = ClienteInfo.objects.get(
-                        cliente=duplicateName
+                        cliente=duplicateName,
+                        is_main=True
                     )
                     if phone == existingClientInfo.telefono:
                         ClienteInfo.objects.filter(
