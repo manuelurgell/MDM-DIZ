@@ -49,6 +49,7 @@ class CompraViewSet(viewsets.ModelViewSet):
 
         else:
             return False
+
     def expired_card(self, monthC, yearC):
         print('chequeo de tarjetas')
         currentYear = datetime.datetime.today().year
@@ -66,7 +67,6 @@ class CompraViewSet(viewsets.ModelViewSet):
         else:
             print('vencida')
             return False
-
 
     def create(self, request, *args, **kwargs):
         dataCompra = request.data.get('compra')
