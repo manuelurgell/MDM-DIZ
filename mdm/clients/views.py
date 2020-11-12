@@ -1,16 +1,17 @@
-from mdm.clients.models import Carrito, CarritoInfo, Cliente, ClienteInfo, Exceptions
+from mdm.clients.models import (
+    Carrito, CarritoInfo, Cliente, ClienteInfo, Exceptions
+)
 from mdm.clients import serializers
 
 from rest_framework import status, viewsets, mixins
 # from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 
+import re
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 import phonenumbers
 from phonenumbers.phonenumberutil import region_code_for_number
-
-import re
 
 # Create your views here
 
@@ -27,8 +28,9 @@ class ClientViewSet(viewsets.ModelViewSet):
         except Exceptions.DoesNotExist:
             return bool(
                 re.match(
-                    '^[^0-9_!¡?÷?¿/\\+=@#$%ˆ&*(){}|~<>;:[\]]{2,}$', clientName)
-                        )
+                    '^[^0-9_!¡?÷?¿/\\+=@#$%ˆ&*(){}|~<>;:[\]]{2,}$', clientName
+                )
+            )
 
     def ValidateEmail(self, email):
         # print(email)

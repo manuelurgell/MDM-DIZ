@@ -5,8 +5,8 @@ from mdm.clients.models import Cliente
 class Compra(models.Model):
     cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)
     noTarjeta = models.CharField(max_length=30)
-    mesTarjeta = models.CharField(max_length=2)
-    anioTarjeta = models.CharField(max_length=2)
+    mesTarjeta = models.CharField(max_length=2, default=None)
+    anioTarjeta = models.CharField(max_length=2, default=None)
     fecha = models.DateTimeField(auto_now_add=True)
     total = models.CharField(max_length=50)
     calle = models.CharField(max_length=50)
