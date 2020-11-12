@@ -24,13 +24,15 @@ class ClientViewSet(viewsets.ModelViewSet):
     def ValidateName(self, clientName):
         try:
             Exceptions.objects.get(nombre=clientName)
-            return True
+            valido = True
         except Exceptions.DoesNotExist:
-            return bool(
+            valido = bool(
                 re.match(
-                    '^[^0-9_!¡?÷?¿/\\+=@#$%ˆ&*(){}|~<>;:[\]]{2,}$', clientName
+                    r'^[^0-9_!¡?÷?¿/\\+=@#$%ˆ&*(){}|~<>;:[\]]{2,}$',
+                    clientName
                 )
             )
+        return valido
 
     def ValidateEmail(self, email):
         # print(email)
@@ -57,6 +59,19 @@ class ClientViewSet(viewsets.ModelViewSet):
             valid_phone = False
         return valid_phone
 
+    def CheckDuplicate(self, clientName, clientLast, birth, gender, phone):
+        try:
+            temporaryClient = Cliente.objects.get(
+                nombrePila=clientName,
+                apellidoPat=clientLast,
+                fechaNac=birth,
+                genero=gender
+            )
+            temporaryId = temporaryClient.id
+        except Cliente.DoesNotExist:
+            temporaryId = "0"
+        return temporaryId
+
     def list(self, request, *args, **kwargs):
         return Response(
             data={"Error": "Unauthorized"},
@@ -69,35 +84,72 @@ class ClientViewSet(viewsets.ModelViewSet):
             data=dataCliente
         )
         if serializer_cliente.is_valid():
-            cliente = serializer_cliente.save()
             dataClienteInfo = request.data.get('clienteInfo')
             clientName = dataCliente["nombrePila"]
+            clientLast = dataCliente["apellidoPat"]
             validName = self.ValidateName(clientName)
             phone = dataClienteInfo["telefono"]
+            birth = dataCliente["fechaNac"]
+            gender = dataCliente["genero"]
+            # address = dataClienteInfo["calle"]
             check = self.ValidatePhone(phone)
             email = dataClienteInfo["correo"]
             check2 = self.ValidateEmail(email)
             if check and check2 and validName:
-                try:
-                    ClienteInfo.objects.create(
-                        cliente=cliente,
-                        telefono=dataClienteInfo["telefono"],
-                        correo=dataClienteInfo["correo"],
-                        is_main=True
+                duplicateName = self.CheckDuplicate(clientName, clientLast, birth, gender, phone)
+                if duplicateName != "0":
+                    existingClientInfo = ClienteInfo.objects.get(cliente=duplicateName)
+                    if phone == existingClientInfo.telefono:
+                        ClienteInfo.objects.filter(cliente=duplicateName).update(is_main=False)
+                        notTheSame = False
+                        # try:
+                        clienteInfo = ClienteInfo.objects.create(
+                            cliente=existingClientInfo.cliente,
+                            telefono=dataClienteInfo["telefono"],
+                            correo=dataClienteInfo["correo"],
+                            is_main=True
+                        )
+                        # except Exception:
+                            # print("Error feo")
+                            # return Response(status=status.HTTP_400_BAD_REQUEST)
+
+                        cliente = ClienteInfo.objects.get(id=clienteInfo.id).cliente
+                        serializer = self.get_serializer(
+                            cliente
+                        )
+
+                        return Response(
+                            # data={"response": "Success"},
+                            data=serializer.data,
+                            status=status.HTTP_201_CREATED
+                        )
+                    else:
+                        notTheSame = True
+                else:
+                    notTheSame = True
+
+                if notTheSame:
+                    try:
+                        cliente = serializer_cliente.save()
+                        ClienteInfo.objects.create(
+                            cliente=cliente,
+                            telefono=dataClienteInfo["telefono"],
+                            correo=dataClienteInfo["correo"],
+                            is_main=True
+                        )
+                    except Exception:
+                        Cliente.objects.filter(id=cliente.id).delete()
+                        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+                    serializer = self.get_serializer(
+                        cliente
                     )
-                except Exception:
-                    Cliente.objects.filter(id=cliente.id).delete()
-                    return Response(status=status.HTTP_400_BAD_REQUEST)
 
-                serializer = self.get_serializer(
-                    cliente
-                )
-
-                return Response(
-                    # data={"response": "Success"},
-                    data=serializer.data,
-                    status=status.HTTP_201_CREATED
-                )
+                    return Response(
+                        # data={"response": "Success"},
+                        data=serializer.data,
+                        status=status.HTTP_201_CREATED
+                    )
             else:
                 Cliente.objects.filter(id=cliente.id).delete()
                 if not validName:
