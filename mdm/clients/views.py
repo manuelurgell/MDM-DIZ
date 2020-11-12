@@ -59,6 +59,14 @@ class ClientViewSet(viewsets.ModelViewSet):
             valid_phone = False
         return valid_phone
 
+    def Duplicate(self, email):
+        try:
+            ClienteInfo.objects.get(correo=email)
+            duplicate = False
+        except ClienteInfo.DoesNotExist:
+            duplicate = True
+        return duplicate
+
     def CheckDuplicate(self, clientName, clientLast, birth, gender, phone):
         try:
             temporaryClient = Cliente.objects.get(
@@ -91,16 +99,22 @@ class ClientViewSet(viewsets.ModelViewSet):
             phone = dataClienteInfo["telefono"]
             birth = dataCliente["fechaNac"]
             gender = dataCliente["genero"]
-            # address = dataClienteInfo["calle"]
             check = self.ValidatePhone(phone)
             email = dataClienteInfo["correo"]
             check2 = self.ValidateEmail(email)
-            if check and check2 and validName:
-                duplicateName = self.CheckDuplicate(clientName, clientLast, birth, gender, phone)
+            check1 = self.Duplicate(email)
+            if check and check1 and check2 and validName:
+                duplicateName = self.CheckDuplicate(
+                    clientName, clientLast, birth, gender, phone
+                )
                 if duplicateName != "0":
-                    existingClientInfo = ClienteInfo.objects.get(cliente=duplicateName)
+                    existingClientInfo = ClienteInfo.objects.get(
+                        cliente=duplicateName
+                    )
                     if phone == existingClientInfo.telefono:
-                        ClienteInfo.objects.filter(cliente=duplicateName).update(is_main=False)
+                        ClienteInfo.objects.filter(
+                            cliente=duplicateName
+                        ).update(is_main=False)
                         notTheSame = False
                         # try:
                         clienteInfo = ClienteInfo.objects.create(
@@ -109,11 +123,10 @@ class ClientViewSet(viewsets.ModelViewSet):
                             correo=dataClienteInfo["correo"],
                             is_main=True
                         )
-                        # except Exception:
-                            # print("Error feo")
-                            # return Response(status=status.HTTP_400_BAD_REQUEST)
 
-                        cliente = ClienteInfo.objects.get(id=clienteInfo.id).cliente
+                        cliente = ClienteInfo.objects.get(
+                            id=clienteInfo.id
+                        ).cliente
                         serializer = self.get_serializer(
                             cliente
                         )
@@ -129,8 +142,8 @@ class ClientViewSet(viewsets.ModelViewSet):
                     notTheSame = True
 
                 if notTheSame:
+                    cliente = serializer_cliente.save()
                     try:
-                        cliente = serializer_cliente.save()
                         ClienteInfo.objects.create(
                             cliente=cliente,
                             telefono=dataClienteInfo["telefono"],
@@ -151,18 +164,10 @@ class ClientViewSet(viewsets.ModelViewSet):
                         status=status.HTTP_201_CREATED
                     )
             else:
-                Cliente.objects.filter(id=cliente.id).delete()
                 if not validName:
                     return Response(
                         data={
                             "Response": "NOT A CORRECT NAME"
-                        },
-                        status=status.HTTP_406_NOT_ACCEPTABLE
-                    )
-                if not check and not check2:
-                    return Response(
-                        data={
-                            "Response": "NOT A CORRECT PHONE AND NOT AN EMAIL"
                         },
                         status=status.HTTP_406_NOT_ACCEPTABLE
                     )
@@ -171,7 +176,12 @@ class ClientViewSet(viewsets.ModelViewSet):
                         data={"Response": "NOT A CORRECT PHONE"},
                         status=status.HTTP_406_NOT_ACCEPTABLE
                     )
-                else:
+                if not check1:
+                    return Response(
+                        data={"Response": "EMAIL ALREADY IN USE"},
+                        status=status.HTTP_406_NOT_ACCEPTABLE
+                    )
+                if not check2:
                     return Response(
                         data={"Response": "NOT AN EMAIL"},
                         status=status.HTTP_406_NOT_ACCEPTABLE
