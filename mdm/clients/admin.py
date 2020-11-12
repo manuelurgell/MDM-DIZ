@@ -1,16 +1,16 @@
 from django.contrib import admin
 
 from mdm.clients.models import (
-    Exceptions,
-    Cliente,
-    ClienteInfo,
     Carrito,
     CarritoInfo,
+    Cliente,
+    ClienteInfo,
+    NameException
 )
 
 
-class ExceptionsAdmin(admin.ModelAdmin):
-    model = Exceptions
+class NameExceptionAdmin(admin.ModelAdmin):
+    model = NameException
     list_display = (
         'id',
         'nombre'
@@ -59,7 +59,7 @@ class CarritoInfoAdmin(admin.ModelAdmin):
 
 
 # Register tour models here
-admin.site.register(Exceptions, ExceptionsAdmin)
+admin.site.register(NameException, NameExceptionAdmin)
 admin.site.register(Cliente, ClienteAdmin)
 admin.site.register(ClienteInfo, ClienteInfoAdmin)
 admin.site.register(Carrito, CarritoAdmin)

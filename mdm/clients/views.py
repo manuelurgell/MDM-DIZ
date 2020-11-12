@@ -1,17 +1,22 @@
-from mdm.clients.models import (
-    Carrito, CarritoInfo, Cliente, ClienteInfo, Exceptions
-)
-from mdm.clients import serializers
-
-from rest_framework import status, viewsets, mixins
-# from rest_framework.generics import GenericAPIView
-from rest_framework.response import Response
-
 import re
-from django.core.validators import validate_email
+
 from django.core.exceptions import ValidationError
+from django.core.validators import validate_email
+
 import phonenumbers
 from phonenumbers.phonenumberutil import region_code_for_number
+
+from rest_framework import mixins, status, viewsets
+from rest_framework.response import Response
+
+from mdm.clients import serializers
+from mdm.clients.models import (
+    Carrito,
+    CarritoInfo,
+    Cliente,
+    ClienteInfo,
+    NameException
+)
 
 # Create your views here
 
@@ -23,9 +28,9 @@ class ClientViewSet(viewsets.ModelViewSet):
 
     def ValidateName(self, clientName):
         try:
-            Exceptions.objects.get(nombre=clientName)
+            NameException.objects.get(nombre=clientName)
             valido = True
-        except Exceptions.DoesNotExist:
+        except NameException.DoesNotExist:
             valido = bool(
                 re.match(
                     r'^[^0-9_!¡?÷?¿/\\+=@#$%ˆ&*(){}|~<>;:[\]]{2,}$',
