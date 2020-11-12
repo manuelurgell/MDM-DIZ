@@ -5,6 +5,9 @@ from phonenumber_field.modelfields import PhoneNumberField
 class Exceptions(models.Model):
     nombre = models.CharField(max_length=50)
 
+    class Meta:
+        verbose_name_plural = "Exceptions"
+
 
 class Cliente(models.Model):
     nombrePila = models.CharField(max_length=30)
