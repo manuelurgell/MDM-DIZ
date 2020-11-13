@@ -16,7 +16,7 @@ class Cliente(models.Model):
     apellidoMat = models.CharField(max_length=30)
     fechaNac = models.DateField()
     genero = models.CharField(max_length=30)
-    created = models.DateTimeField(auto_now_add=True)
+    created_date = models.DateTimeField(auto_now_add=True)
     is_deleted = models.BooleanField(default=False)
 
 
@@ -38,7 +38,7 @@ class ClienteInfo(models.Model):
     colonia = models.CharField(
         max_length=50, null=True, blank=True, default=''
     )
-    cuidad = models.CharField(
+    ciudad = models.CharField(
         max_length=50, null=True, blank=True, default=''
     )
     cp = models.CharField(

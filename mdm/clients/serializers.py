@@ -25,7 +25,7 @@ class ClienteInfoSerializer(serializers.ModelSerializer):
             'correo',
             'calle',
             'colonia',
-            'cuidad',
+            'ciudad',
             'cp',
             'estado',
             'entreCalles',
