@@ -15,21 +15,21 @@ class ValidateNameTestCase(TestCase):
         )
 
     def test_is_valid(self):
-        """Test max_length values."""
+        """Test valid-name."""
         self.assertEqual(
             ClientViewSet.ValidateName(self, 'Manuel'),
             True
         )
 
     def test_is_not_valid(self):
-        """Test max_length values."""
+        """Test non-valid name."""
         self.assertEqual(
             ClientViewSet.ValidateName(self, 'X Æ A-12'),
             False
         )
 
     def test_is_valid_on_except(self):
-        """Test max_length values."""
+        """Test non-valid name on Exceptions table."""
         nexcept = self.nexcept
         with transaction.atomic():
             nexcept.nombre = 'X Æ A-12'
