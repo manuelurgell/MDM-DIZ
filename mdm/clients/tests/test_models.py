@@ -15,7 +15,7 @@ class NameExceptionTestCase(TestCase):
         )
 
     def test_length(self):
-        """Test max_length values"""
+        """Test max_length values."""
         nexcept = self.nexcept
         with transaction.atomic():
             nexcept.nombre = 'x'*51
