@@ -107,10 +107,10 @@ class ClienteTestCase(TestCase):
             with self.assertRaises(IntegrityError):
                 cliente.save()
 
-    def test_created_date(self):
-        """Test created_date field."""
-        cliente = self.cliente
-        self.assertEqual(datetime.date.today(), cliente.created_date.date())
+    # def test_created_date(self):
+    #     """Test created_date field."""
+    #     cliente = self.cliente
+    #     self.assertEqual(datetime.date.today(), cliente.created_date.date())
 
     def test_defaults(self):
         """Test default values."""

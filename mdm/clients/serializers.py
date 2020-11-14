@@ -21,7 +21,6 @@ class ClienteInfoSerializer(serializers.ModelSerializer):
     class Meta:
         model = ClienteInfo
         fields = [
-            'cliente',
             'telefono',
             'correo',
             'calle',
@@ -57,9 +56,17 @@ class CarritoInfoSerializer(serializers.ModelSerializer):
     class Meta:
         model = CarritoInfo
         fields = [
-            'carrito',
             'codigoProducto',
             'cantidadProducto'
+        ]
+
+
+class CreateCarritoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Cliente
+        fields = [
+            'cliente',
+            'fecha'
         ]
 
 
@@ -72,13 +79,4 @@ class CarritoSerializer(serializers.ModelSerializer):
             'cliente',
             'fecha',
             'carritoInfo'
-        ]
-
-
-class CreateCarritoSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Cliente
-        fields = [
-            'cliente',
-            'fecha'
         ]

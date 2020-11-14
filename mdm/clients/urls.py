@@ -11,7 +11,7 @@ router.register(
     views.ClienteRetrieveView
 )
 router.register(r'clients', views.ClientViewSet)
-router.register(r'carritos', views.CarritoViewSet)
+router.register(r'carts', views.CarritoViewSet)
 
 urlpatterns = [
     path('', include(router.urls))

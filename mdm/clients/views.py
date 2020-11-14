@@ -196,14 +196,8 @@ class ClientViewSet(viewsets.ModelViewSet):
     def retrieve(self, request, *args, **kwargs):
         try:
             cliente = self.get_object()
-            if not cliente.is_deleted:
-                serializer = serializers.ClienteSerializer(cliente)
-                data = serializer.data
-            else:
-                return Response(
-                    data={"Response": "NOT_FOUND"},
-                    status=status.HTTP_404_NOT_FOUND
-                )
+            serializer = serializers.ClienteSerializer(cliente)
+            data = serializer.data
         except Exception:
             return Response(
                 data={"Response": "NOT_FOUND"},
@@ -281,27 +275,20 @@ class CarritoViewSet(viewsets.GenericViewSet):
         except Carrito.DoesNotExist:
             return False
 
-    def list(self, request, *args, **kwargs):
-        return Response(
-            data={"Error": "Unauthorized"},
-            status=status.HTTP_401_UNAUTHORIZED
-        )
-
     def create(self, request, *args, **kwargs):
         id = request.data.get('id')
         try:
-            cliente = Cliente.objects.get(id=id)
+            cliente = Cliente.objects.get(id=id, is_deleted=False)
         except Exception:
             return Response(
                 data={"Response": "NOT_FOUND"},
                 status=status.HTTP_404_NOT_FOUND
             )
 
-        duplicate = self.Duplicate(request.data.get('id'))
-        if duplicate:
-            Carrito.objects.get(cliente_id=id).delete()
-
         try:
+            duplicate = self.Duplicate(request.data.get('id'))
+            if duplicate:
+                Carrito.objects.get(cliente_id=id).delete()
             carrito = Carrito.objects.create(
                 cliente=cliente
             )
@@ -328,4 +315,26 @@ class CarritoViewSet(viewsets.GenericViewSet):
         return Response(
             data=serializer.data,
             status=status.HTTP_201_CREATED
+        )
+
+    def retrieve(self, request, *args, **kwargs):
+        try:
+            carrito = self.get_object()
+            cliente = carrito.cliente
+            if not cliente.is_deleted:
+                serializer = serializers.CarritoSerializer(carrito)
+                data = serializer.data
+            else:
+                return Response(
+                    data={"Response": "NOT_FOUND"},
+                    status=status.HTTP_404_NOT_FOUND
+                )
+        except Exception:
+            return Response(
+                data={"Response": "NOT_FOUND"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        return Response(
+            data=data,
+            status=status.HTTP_302_FOUND
         )

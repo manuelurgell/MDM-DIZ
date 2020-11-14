@@ -3,7 +3,7 @@ import datetime
 from rest_framework import status, viewsets
 from rest_framework.response import Response
 
-from mdm.clients.models import ClienteInfo
+from mdm.clients.models import Cliente
 from mdm.orders import serializers
 from mdm.orders.models import Compra, Factura, Pedido
 
@@ -69,17 +69,29 @@ class CompraViewSet(viewsets.ModelViewSet):
             return False
 
     def create(self, request, *args, **kwargs):
-        dataCompra = request.data.get('compra')
-        correo = dataCompra["correo"]
-        cliente = ClienteInfo.objects.get(
-            correo=correo,
-            is_main=True
-        ).cliente
-        tarjeta = dataCompra["noTarjeta"]
-        validateCard = self.card_luhn(tarjeta)
-        mesT = int(dataCompra["mesTarjeta"])
-        anioT = int(dataCompra["anioTarjeta"])
-        checkExpired = self.expired_card(mesT, anioT)
+        try:
+            cliente = Cliente.objects.get(
+                id=request.data.get('id'),
+                is_deleted=False
+            )
+        except Exception:
+            return Response(
+                data={"Response": "NOT_FOUND"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        try:
+            dataCompra = request.data.get('compra')
+            tarjeta = dataCompra["noTarjeta"]
+            validateCard = self.card_luhn(tarjeta)
+            mesT = int(dataCompra["mesTarjeta"])
+            anioT = int(dataCompra["anioTarjeta"])
+            checkExpired = self.expired_card(mesT, anioT)
+        except Exception:
+            return Response(
+                data={"Response": "NOT_ACCEPTABLE"},
+                status=status.HTTP_406_NOT_ACCEPTABLE
+            )
+
         if validateCard and checkExpired:
             try:
                 compra = Compra.objects.create(
@@ -96,43 +108,61 @@ class CompraViewSet(viewsets.ModelViewSet):
                     estado=dataCompra["estado"],
                     entreCalles=dataCompra["entreCalles"]
                 )
-                try:
-                    dataPedido = request.data.get('pedido')
-
-                    Pedido.objects.create(
-                        compra=compra,
-                        codigoProducto=dataPedido["codigoProducto"],
-                        cantidadProducto=dataPedido["cantidadProducto"],
-                        precioProducto=dataPedido["precioProducto"]
-                    )
-                except Exception:
-                    Compra.objects.filter(id=compra.id).delete()
-                    return Response(status=status.HTTP_400_BAD_REQUEST)
             except Exception:
                 return Response(status=status.HTTP_400_BAD_REQUEST)
+
+            for producto in request.data.get('pedido'):
+                try:
+                    Pedido.objects.create(
+                        compra=compra,
+                        codigoProducto=producto["codigoProducto"],
+                        cantidadProducto=producto["cantidadProducto"],
+                        precioProducto=producto["precioProducto"]
+                    )
+                except Exception:
+                    return Response(
+                        data={"Response": "ERROR"},
+                        status=status.HTTP_406_NOT_ACCEPTABLE
+                    )
+
             serializer = self.get_serializer(compra)
 
             return Response(
-                # data={"response": "Success"},
                 data=serializer.data,
                 status=status.HTTP_201_CREATED
             )
         else:
-            if not checkExpired and not validateCard:
-                return Response(
-                    data={"Response": "CARD NOT VALID AND EXPIRED"},
-                    status=status.HTTP_406_NOT_ACCEPTABLE
-                )
-            elif not checkExpired:
-                return Response(
-                    data={"Response": "EXPIRED_CARD"},
-                    status=status.HTTP_406_NOT_ACCEPTABLE
-                )
-            else:
+            if not validateCard:
                 return Response(
                     data={"Response": "CARD_NOT_VALID"},
                     status=status.HTTP_406_NOT_ACCEPTABLE
                 )
+            if not checkExpired:
+                return Response(
+                    data={"Response": "EXPIRED_CARD"},
+                    status=status.HTTP_406_NOT_ACCEPTABLE
+                )
+
+    def retrieve(self, request, *args, **kwargs):
+        try:
+            cliente = Cliente.objects.get(id=self.kwargs['pk'])
+            if not cliente.is_deleted:
+                serializer = serializers.ClienteSerializer(cliente)
+                data = serializer.data
+            else:
+                return Response(
+                    data={"Response": "NOT_FOUND"},
+                    status=status.HTTP_404_NOT_FOUND
+                )
+        except Exception:
+            return Response(
+                data={"Response": "NOT_FOUND"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        return Response(
+            data=data,
+            status=status.HTTP_302_FOUND
+        )
 
 
 class FacturaViewSet(viewsets.ModelViewSet):
