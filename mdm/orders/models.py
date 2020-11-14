@@ -4,7 +4,11 @@ from mdm.clients.models import Cliente
 
 
 class Compra(models.Model):
-    cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)
+    cliente = models.ForeignKey(
+        Cliente,
+        on_delete=models.CASCADE,
+        related_name='compra'
+    )
     noTarjeta = models.CharField(max_length=30)
     mesTarjeta = models.CharField(max_length=2, default=None)
     anioTarjeta = models.CharField(max_length=2, default=None)

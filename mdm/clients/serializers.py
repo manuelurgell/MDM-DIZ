@@ -2,6 +2,7 @@
 from rest_framework import serializers
 
 from mdm.clients.models import Carrito, CarritoInfo, Cliente, ClienteInfo
+from mdm.orders.serializers import CompraSerializer
 
 
 class CreateClienteSerializer(serializers.ModelSerializer):
@@ -35,6 +36,7 @@ class ClienteInfoSerializer(serializers.ModelSerializer):
 
 class ClienteSerializer(serializers.ModelSerializer):
     clienteInfo = ClienteInfoSerializer(many=True)
+    compra = CompraSerializer(many=True)
 
     class Meta:
         model = Cliente
@@ -46,7 +48,8 @@ class ClienteSerializer(serializers.ModelSerializer):
             'fechaNac',
             'genero',
             'is_deleted',
-            'clienteInfo'
+            'clienteInfo',
+            'compra'
         ]
 
 
@@ -69,4 +72,13 @@ class CarritoSerializer(serializers.ModelSerializer):
             'cliente',
             'fecha',
             'carritoInfo'
+        ]
+
+
+class CreateCarritoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Cliente
+        fields = [
+            'cliente',
+            'fecha'
         ]

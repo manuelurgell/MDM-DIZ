@@ -43,7 +43,6 @@ class CarritoAdmin(admin.ModelAdmin):
     model = Carrito
     list_display = (
         'cliente_id',
-        'id',
         'fecha'
     )
 
@@ -52,7 +51,6 @@ class CarritoInfoAdmin(admin.ModelAdmin):
     model = CarritoInfo
     list_display = (
         'carrito_id',
-        'id',
         'codigoProducto',
         'cantidadProducto'
     )

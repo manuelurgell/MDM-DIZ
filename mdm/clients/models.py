@@ -57,7 +57,11 @@ class ClienteInfo(models.Model):
 
 
 class Carrito(models.Model):
-    cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)
+    cliente = models.OneToOneField(
+        Cliente,
+        on_delete=models.CASCADE,
+        primary_key=True
+    )
     fecha = models.DateTimeField(auto_now_add=True)
 
     class Meta:

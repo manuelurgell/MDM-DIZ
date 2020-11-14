@@ -89,12 +89,6 @@ class ClientViewSet(viewsets.ModelViewSet):
             temporaryId = "0"
         return temporaryId
 
-    def list(self, request, *args, **kwargs):
-        return Response(
-            data={"Error": "Unauthorized"},
-            status=status.HTTP_401_UNAUTHORIZED
-        )
-
     def create(self, request, *args, **kwargs):
         dataCliente = request.data.get('cliente')
         serializer_cliente = serializers.CreateClienteSerializer(
@@ -126,7 +120,7 @@ class ClientViewSet(viewsets.ModelViewSet):
                             cliente=duplicateName
                         ).update(is_main=False)
                         notTheSame = False
-                        # try:
+
                         clienteInfo = ClienteInfo.objects.create(
                             cliente=existingClientInfo.cliente,
                             telefono=dataClienteInfo["telefono"],
@@ -203,7 +197,7 @@ class ClientViewSet(viewsets.ModelViewSet):
         try:
             cliente = self.get_object()
             if not cliente.is_deleted:
-                serializer = self.get_serializer(cliente)
+                serializer = serializers.ClienteSerializer(cliente)
                 data = serializer.data
             else:
                 return Response(
@@ -246,7 +240,6 @@ class ClientViewSet(viewsets.ModelViewSet):
 
 
 class ClienteRetrieveView(mixins.ListModelMixin, viewsets.GenericViewSet):
-
     queryset = Cliente.objects.all()
     serializer_class = serializers.ClienteSerializer
 
@@ -276,39 +269,17 @@ class ClienteRetrieveView(mixins.ListModelMixin, viewsets.GenericViewSet):
             )
 
 
-class ClienteUpdateView(viewsets.GenericViewSet):
-    queryset = Cliente.objects.all()
-    serializer_class = serializers.ClienteSerializer
-
-    def create(self, request, *args, **kwargs):
-        correoActual = self.request.GET.get('correo')
-        print(correoActual)
-        try:
-            cliente_id = ClienteInfo.objects.get(
-                correo=correoActual,
-                is_main=True
-            ).cliente.id
-            cliente = Cliente.objects.filter(id=cliente_id)
-            serializer = serializers.CreateClienteSerializer(
-                cliente,
-                data=self.request.data.get('cliente'),
-                partial=True
-            )
-            return Response(
-                data={"Response": serializer.data},
-                status=status.HTTP_204_NO_CONTENT
-            )
-        except Exception:
-            return Response(
-                data={"Response": "Error"},
-                status=status.HTTP_404_NOT_FOUND
-            )
-
-
 class CarritoViewSet(viewsets.GenericViewSet):
     'List, create, retreive, update or delete carritos'
     queryset = Carrito.objects.all()
     serializer_class = serializers.CarritoSerializer
+
+    def Duplicate(self, id):
+        try:
+            Carrito.objects.get(cliente_id=id)
+            return True
+        except Carrito.DoesNotExist:
+            return False
 
     def list(self, request, *args, **kwargs):
         return Response(
@@ -316,66 +287,45 @@ class CarritoViewSet(viewsets.GenericViewSet):
             status=status.HTTP_401_UNAUTHORIZED
         )
 
-    def delete(self, cliente):
-        Carrito.objects.filter(cliente_id=cliente.id).delete()
-
     def create(self, request, *args, **kwargs):
-        correo = request.data.get('carrito')["correo"]
-        cliente = ClienteInfo.objects.get(
-            correo=correo,
-            is_main=True
-        ).cliente
-        self.delete(cliente)
+        id = request.data.get('id')
         try:
-            carrito = Carrito.objects.create(
-                cliente=cliente
-            )
-            try:
-                dataCarritoInfo = request.data.get('carritoInfo')
-                CarritoInfo.objects.create(
-                    carrito=carrito,
-                    codigoProducto=dataCarritoInfo["codigoProducto"],
-                    cantidadProducto=dataCarritoInfo["cantidadProducto"]
-                )
-
-                serializer = serializers.CarritoSerializer(
-                    carrito
-                )
-
-                return Response(
-                    # data={"response": "Success"},
-                    data=serializer.data,
-                    status=status.HTTP_201_CREATED
-                )
-            except Exception:
-                Carrito.objects.filter(id=carrito.id).delete()
-                return Response(data="1", status=status.HTTP_400_BAD_REQUEST)
-        except Exception:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
-
-
-class CarritoRetrieveView(mixins.ListModelMixin, viewsets.GenericViewSet):
-    queryset = Carrito.objects.all()
-    serializer_class = serializers.CarritoSerializer
-
-    def list(self, request, *args, **kwargs):
-        correo = self.request.GET.get('correo')
-        try:
-            cliente = ClienteInfo.objects.get(
-                correo=correo,
-                is_main=True
-            ).cliente
-
-            carrito = Carrito.objects.get(cliente=cliente)
-
-            serializer = self.get_serializer(carrito)
-
-            return Response(
-                data=serializer.data,
-                status=status.HTTP_302_FOUND
-            )
+            cliente = Cliente.objects.get(id=id)
         except Exception:
             return Response(
                 data={"Response": "NOT_FOUND"},
                 status=status.HTTP_404_NOT_FOUND
             )
+
+        duplicate = self.Duplicate(request.data.get('id'))
+        if duplicate:
+            Carrito.objects.get(cliente_id=id).delete()
+
+        try:
+            carrito = Carrito.objects.create(
+                cliente=cliente
+            )
+        except Exception:
+            return Response(
+                data={"Response": "ERROR"},
+                status=status.HTTP_406_NOT_ACCEPTABLE
+            )
+        for producto in request.data.get('carritoInfo'):
+            try:
+                CarritoInfo.objects.create(
+                    carrito=carrito,
+                    codigoProducto=producto["codigoProducto"],
+                    cantidadProducto=producto["cantidadProducto"]
+                )
+            except Exception:
+                return Response(
+                    data={"Response": "ERROR"},
+                    status=status.HTTP_406_NOT_ACCEPTABLE
+                )
+
+        serializer = self.get_serializer(carrito)
+
+        return Response(
+            data=serializer.data,
+            status=status.HTTP_201_CREATED
+        )
