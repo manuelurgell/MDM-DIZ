@@ -26,6 +26,21 @@ class ClientViewSet(viewsets.ModelViewSet):
     queryset = Cliente.objects.all()
     serializer_class = serializers.ClienteSerializer
 
+    def validateGender(self, clientName, gender):
+        try:
+            if gender == "H" or gender == "M" or gender == "O":
+                if re.match('.*[Aa]$', clientName) and gender == "H":
+                    valido = False
+                elif re.match('.*(OS|o|O|os)$', clientName) and gender == "M":
+                    valido = False
+                else:
+                    valido = True
+            else:
+                valido = False
+        except Exception:
+            valido = False
+        return valido
+
     def ValidateName(self, clientName):
         try:
             NameException.objects.get(nombre=clientName)
@@ -102,11 +117,12 @@ class ClientViewSet(viewsets.ModelViewSet):
             phone = dataClienteInfo["telefono"]
             birth = dataCliente["fechaNac"]
             gender = dataCliente["genero"]
+            checkGender = self.validateGender(clientName, gender)
             check = self.ValidatePhone(phone)
             email = dataClienteInfo["correo"]
             check2 = self.ValidateEmail(email)
             check1 = self.Duplicate(email)
-            if check and check1 and check2 and validName:
+            if check and check1 and check2 and validName and checkGender:
                 duplicateName = self.CheckDuplicate(
                     clientName, clientLast, birth, gender, phone
                 )
@@ -188,6 +204,11 @@ class ClientViewSet(viewsets.ModelViewSet):
                 if not check2:
                     return Response(
                         data={"Response": "NOT AN EMAIL"},
+                        status=status.HTTP_406_NOT_ACCEPTABLE
+                    )
+                if not checkGender:
+                    return Response(
+                        data={"Response": "GENDER PROBABLY INCORRECT"},
                         status=status.HTTP_406_NOT_ACCEPTABLE
                     )
         else:

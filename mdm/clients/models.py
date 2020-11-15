@@ -15,7 +15,7 @@ class Cliente(models.Model):
     apellidoPat = models.CharField(max_length=30)
     apellidoMat = models.CharField(max_length=30)
     fechaNac = models.DateField()
-    genero = models.CharField(max_length=30)
+    genero = models.CharField(max_length=1)
     created_date = models.DateTimeField(auto_now_add=True)
     is_deleted = models.BooleanField(default=False)
 

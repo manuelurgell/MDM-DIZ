@@ -159,3 +159,34 @@ class ValidateEmailTestCase(TestCase):
             ClientViewSet.ValidateEmail(self, 'correo@example.'),
             False
         )
+
+
+class ValidateGenreTestCase(TestCase):
+    """Test validateGenre function."""
+    def setUp(self): None
+
+    def test_is_valid(self):
+        """Test genre is_valid."""
+        self.assertEqual(
+            ClientViewSet.validateGender(self, 'Melisa', 'M'),
+            True
+        )
+        self.assertEqual(
+            ClientViewSet.validateGender(self, 'EMILIANO', 'H'),
+            True
+        )
+
+    def test_is_not_valid(self):
+        """Test email not is_valid."""
+        self.assertEqual(
+            ClientViewSet.validateGender(self, 'Mario', 'Hombre'),
+            False
+        )
+        self.assertEqual(
+            ClientViewSet.validateGender(self, 'Melisa', 'H'),
+            False
+        )
+        self.assertEqual(
+            ClientViewSet.validateGender(self, 'Emiliano', 'M'),
+            False
+        )
