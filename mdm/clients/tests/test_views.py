@@ -175,9 +175,13 @@ class ValidateGenreTestCase(TestCase):
             ClientViewSet.validateGender(self, 'EMILIANO', 'H'),
             True
         )
+        self.assertEqual(
+            ClientViewSet.validateGender(self, 'Jose Maria', 'O'),
+            True
+        )
 
     def test_is_not_valid(self):
-        """Test email not is_valid."""
+        """Test genre not is_valid."""
         self.assertEqual(
             ClientViewSet.validateGender(self, 'Mario', 'Hombre'),
             False
