@@ -172,11 +172,15 @@ class ValidateGenreTestCase(TestCase):
             True
         )
         self.assertEqual(
-            ClientViewSet.validateGender(self, 'EMILIANO', 'H'),
+            ClientViewSet.validateGender(self, 'Melisa', 'O'),
             True
         )
         self.assertEqual(
-            ClientViewSet.validateGender(self, 'Jose Maria', 'O'),
+            ClientViewSet.validateGender(self, 'Emiliano', 'H'),
+            True
+        )
+        self.assertEqual(
+            ClientViewSet.validateGender(self, 'Emiliano', 'O'),
             True
         )
 

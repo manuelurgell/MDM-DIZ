@@ -1,5 +1,4 @@
 import re
-import requests
 
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
@@ -18,7 +17,7 @@ from mdm.clients.models import (
     ClienteInfo,
     NameException
 )
-
+from mdm.utils import call_me
 
 # Create your views here
 
@@ -106,35 +105,6 @@ class ClientViewSet(viewsets.ModelViewSet):
             temporaryId = "0"
         return temporaryId
 
-    def callSSOT(self, cliente_id, contrasena):
-        url = 'http://35.239.19.77:8000/carts/'|
-
-        headers = {
-            "Content-Type": "application/json"
-        }
-
-        status = 201
-
-        data = {
-            "id": cliente_id,
-            "contrasena": contrasena
-        }
-
-        response = requests.post(
-            url,
-            json=data,
-            headers=headers
-        )
-
-        print(response.status_code)
-        print(response.json())
-
-        if response.status_code == status:
-            return True
-        else:
-            return False
-
-
     def create(self, request, *args, **kwargs):
         dataCliente = request.data.get('cliente')
         serializer_cliente = serializers.CreateClienteSerializer(
@@ -209,20 +179,57 @@ class ClientViewSet(viewsets.ModelViewSet):
                         cliente
                     )
 
-                    self.callSSOT(cliente.id, dataCliente["contrasena"])
-                    self.callMKT()
+                    # Call SSOT
+                    SSOT = True
+                    # url = 'http://35.239.19.77:8000/carts/'
+                    # headers = {
+                    #     "Content-Type": "application/json"
+                    # }
+                    # status_code = 201
+                    # data = {
+                    #     "id": cliente.id,
+                    #     "contrasena": request.data.get('contrasena')
+                    # }
+                    # SSOT = call_me.maybe(
+                    #     url,
+                    #     headers,
+                    #     data,
+                    #     status_code
+                    # )
+
+                    # Call MKT
+                    # url = 'http://35.239.19.77:8000/carts/'
+                    # headers = {
+                    #     "Content-Type": "application/json"
+                    # }
+                    # status_code = 201
+                    # data = {
+                    #     "id": cliente.id,
+                    #     "contrasena": dataCliente["contrasena"]
+                    # }
+                    # call_me.maybe(
+                    #     url,
+                    #     headers,
+                    #     data,
+                    #     status_code
+                    # )
+
+                    if not SSOT:
+                        cliente.delete()
+                        cliente.save()
+                        return Response(
+                            data={"Response": "SSOT_FAILED"},
+                            status=status.HTTP_417_EXPECTATION_FAILED
+                        )
 
                     return Response(
-                        # data={"response": "Success"},
-                        data=serializer.data,
-                        status=status.HTTP_201_CREATED
-                    )
+                            data=serializer.data,
+                            status=status.HTTP_201_CREATED
+                        )
             else:
                 if not validName:
                     return Response(
-                        data={
-                            "Response": "NOT A CORRECT NAME"
-                        },
+                        data={"Response": "NOT A CORRECT NAME"},
                         status=status.HTTP_406_NOT_ACCEPTABLE
                     )
                 if not check:
