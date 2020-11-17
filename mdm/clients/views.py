@@ -1,4 +1,5 @@
 import re
+import requests
 
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
@@ -17,6 +18,7 @@ from mdm.clients.models import (
     ClienteInfo,
     NameException
 )
+
 
 # Create your views here
 
@@ -104,6 +106,35 @@ class ClientViewSet(viewsets.ModelViewSet):
             temporaryId = "0"
         return temporaryId
 
+    def callSSOT(self, cliente_id, contrasena):
+        url = 'http://35.239.19.77:8000/carts/'|
+
+        headers = {
+            "Content-Type": "application/json"
+        }
+
+        status = 201
+
+        data = {
+            "id": cliente_id,
+            "contrasena": contrasena
+        }
+
+        response = requests.post(
+            url,
+            json=data,
+            headers=headers
+        )
+
+        print(response.status_code)
+        print(response.json())
+
+        if response.status_code == status:
+            return True
+        else:
+            return False
+
+
     def create(self, request, *args, **kwargs):
         dataCliente = request.data.get('cliente')
         serializer_cliente = serializers.CreateClienteSerializer(
@@ -177,6 +208,9 @@ class ClientViewSet(viewsets.ModelViewSet):
                     serializer = self.get_serializer(
                         cliente
                     )
+
+                    self.callSSOT(cliente.id, dataCliente["contrasena"])
+                    self.callMKT()
 
                     return Response(
                         # data={"response": "Success"},
