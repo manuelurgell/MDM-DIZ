@@ -33,6 +33,21 @@ class ClienteInfoSerializer(serializers.ModelSerializer):
         ]
 
 
+class UpdateClienteSerializer(serializers.ModelSerializer):
+    clienteInfo = ClienteInfoSerializer(many=True)
+
+    class Meta:
+        model = Cliente
+        fields = [
+            'nombrePila',
+            'apellidoPat',
+            'apellidoMat',
+            'fechaNac',
+            'genero',
+            'clienteInfo'
+        ]
+
+
 class ClienteSerializer(serializers.ModelSerializer):
     clienteInfo = ClienteInfoSerializer(many=True)
     compra = CompraSerializer(many=True)

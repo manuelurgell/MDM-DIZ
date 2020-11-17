@@ -41,7 +41,7 @@ from mdm.utils import call_me
 
 
 class ClientViewSet(viewsets.ModelViewSet):
-    '''List, create, retrieve, update, partial_update or delete clientes'''
+    '''List, create, retrieve, update, partial_update or destroy clientes'''
     queryset = Cliente.objects.all()
     serializer_class = serializers.ClienteSerializer
 
@@ -285,6 +285,29 @@ class ClientViewSet(viewsets.ModelViewSet):
         return Response(
             data=data,
             status=status.HTTP_302_FOUND
+        )
+
+    def partial_update(self, request, *args, **kwargs):
+        clienteInfo = serializers.ClienteInfoSerializer(
+            data=request.data.get('clienteInfo'),
+            partial=True
+        )
+        dataCliente = request.data.get('cliente')
+        dataCliente['clienteInfo'] = clienteInfo
+        cliente = serializers.UpdateClienteSerializer(
+            data=dataCliente,
+            partial=True
+        )
+        print(cliente.data)
+        if cliente.is_valid():
+            cliente.save()
+            return Response(
+                data=cliente.data,
+                status=status.HTTP_202_ACCEPTED
+            )
+        return Response(
+            data="Error",
+            status=status.HTTP_400_BAD_REQUEST
         )
 
     def destroy(self, request, *args, **kwargs):
