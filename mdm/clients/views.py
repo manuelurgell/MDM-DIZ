@@ -21,6 +21,24 @@ from mdm.utils import call_me
 
 # Create your views here
 
+# partial_update para Cliente Info y Cliente Info donde is_main=True
+# Call MKT
+# url = 'http://35.239.19.77:8000/carts/'
+# headers = {
+#     "Content-Type": "application/json"
+# }
+# status_code = 201
+# data = {
+#     "id": cliente.id,
+#     "contrasena": dataCliente["contrasena"]
+# }
+# call_me.maybe(
+#     url,
+#     headers,
+#     data,
+#     status_code
+# )
+
 
 class ClientViewSet(viewsets.ModelViewSet):
     '''List, create, retrieve, update, partial_update or delete clientes'''
@@ -216,7 +234,6 @@ class ClientViewSet(viewsets.ModelViewSet):
 
                     if not SSOT:
                         cliente.delete()
-                        cliente.save()
                         return Response(
                             data={"Response": "SSOT_FAILED"},
                             status=status.HTTP_417_EXPECTATION_FAILED
@@ -373,6 +390,23 @@ class CarritoViewSet(viewsets.GenericViewSet):
                 )
 
         serializer = self.get_serializer(carrito)
+
+        # Call MKT
+        # url = 'http://35.239.19.77:8000/carts/'
+        # headers = {
+        #     "Content-Type": "application/json"
+        # }
+        # status_code = 201
+        # data = {
+        #     "id": cliente.id,
+        #     "contrasena": dataCliente["contrasena"]
+        # }
+        # call_me.maybe(
+        #     url,
+        #     headers,
+        #     data,
+        #     status_code
+        # )
 
         return Response(
             data=serializer.data,

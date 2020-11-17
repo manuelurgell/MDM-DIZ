@@ -127,6 +127,31 @@ class CompraViewSet(viewsets.ModelViewSet):
 
             serializer = self.get_serializer(compra)
 
+            # Call LOG
+            LOG = True
+            # url = 'http://35.239.19.77:8000/carts/'
+            # headers = {
+            #     "Content-Type": "application/json"
+            # }
+            # status_code = 201
+            # data = {
+            #     "id": cliente.id,
+            #     "contrasena": dataCliente["contrasena"]
+            # }
+            # call_me.maybe(
+            #     url,
+            #     headers,
+            #     data,
+            #     status_code
+            # )
+
+            if not LOG:
+                compra.delete()
+                return Response(
+                    data={"Response": "LOGISTICS_FAILED"},
+                    status=status.HTTP_417_EXPECTATION_FAILED
+                )
+
             return Response(
                 data=serializer.data,
                 status=status.HTTP_201_CREATED
@@ -210,6 +235,23 @@ class FacturaViewSet(viewsets.ModelViewSet):
             serializer = self.get_serializer(dataFactura)
         except Exception:
             return Response(status=status.HTTP_400_BAD_REQUEST)
+
+        # Call MKT
+        # url = 'http://35.239.19.77:8000/carts/'
+        # headers = {
+        #     "Content-Type": "application/json"
+        # }
+        # status_code = 201
+        # data = {
+        #     "id": cliente.id,
+        #     "contrasena": dataCliente["contrasena"]
+        # }
+        # call_me.maybe(
+        #     url,
+        #     headers,
+        #     data,
+        #     status_code
+        # )
 
         return Response(
             # data={"response": "Success"},
