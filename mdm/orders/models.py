@@ -35,7 +35,11 @@ class Pedido(models.Model):
 
 
 class Factura(models.Model):
-    compra = models.ForeignKey(Compra, on_delete=models.CASCADE)
+    compra = models.OneToOneField(
+        Compra,
+        on_delete=models.CASCADE,
+        primary_key=True
+    )
     RFC = models.CharField(max_length=30)
     razonSocial = models.CharField(max_length=30)
     fecha = models.DateTimeField(auto_now_add=True)

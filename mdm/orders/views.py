@@ -195,46 +195,49 @@ class FacturaViewSet(viewsets.ModelViewSet):
     queryset = Factura.objects.all()
     serializer_class = serializers.FacturaSerializer
 
+    def Duplicate(self, compra):
+        try:
+            Factura.objects.get(compra=compra)
+            return True
+        except Factura.DoesNotExist:
+            return False
+
     def create(self, request, *args, **kwargs):
         data = request.data
         compra_id = data["compra_id"]
-        compra = Compra.objects.get(
-            id=compra_id
-        )
-        pedido = Pedido.objects.filter(compra=compra)
-        Factura.objects.create(
-            compra=compra,
-            RFC=data["RFC"],
-            razonSocial=data["razonSocial"],
-            correo=data["correo"],
-            telefono=data["telefono"],
-            calle=data["calle"],
-            numero=data["numero"],
-            colonia=data["colonia"],
-            ciudad=data["ciudad"],
-            cp=data["cp"],
-            estado=data["estado"],
-            entreCalles=data["entreCalles"]
-        )
-        dataFactura = {
-            "compra": compra,
-            "RFC": data["RFC"],
-            "razonSocial": data["razonSocial"],
-            "correo": data["correo"],
-            "telefono": data["telefono"],
-            "calle": data["calle"],
-            "numero": data["numero"],
-            "colonia": data["colonia"],
-            "ciudad": data["ciudad"],
-            "cp": data["cp"],
-            "estado": data["estado"],
-            "entreCalles": data["entreCalles"],
-            "pedido": pedido
-        }
         try:
-            serializer = self.get_serializer(dataFactura)
+            compra = Compra.objects.get(
+                id=compra_id
+            )
+        except Exception:
+            return Response(
+                data={"Response": "NOT_FOUND"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        try:
+            duplicate = self.Duplicate(compra)
+            if duplicate:
+                factura = Factura.objects.get(compra=compra)
+            else:
+                factura = Factura.objects.create(
+                    RFC=data["RFC"],
+                    razonSocial=data["razonSocial"],
+                    correo=data["correo"],
+                    telefono=data["telefono"],
+                    calle=data["calle"],
+                    numero=data["numero"],
+                    colonia=data["colonia"],
+                    ciudad=data["ciudad"],
+                    cp=data["cp"],
+                    estado=data["estado"],
+                    entreCalles=data["entreCalles"],
+                    compra=compra,
+                )
         except Exception:
             return Response(status=status.HTTP_400_BAD_REQUEST)
+
+        serializer = self.get_serializer(factura)
 
         # Call MKT
         # url = 'http://35.239.19.77:8000/carts/'
@@ -254,7 +257,6 @@ class FacturaViewSet(viewsets.ModelViewSet):
         # )
 
         return Response(
-            # data={"response": "Success"},
             data=serializer.data,
             status=status.HTTP_201_CREATED
         )

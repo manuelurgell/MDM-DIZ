@@ -38,12 +38,11 @@ class CompraSerializer(serializers.ModelSerializer):
 
 
 class FacturaSerializer(serializers.ModelSerializer):
-    compra = CompraSerializer(many=True)
+    compra = CompraSerializer()
 
     class Meta:
         model = Factura
         fields = [
-            'compra',
             'RFC',
             'razonSocial',
             'fecha',
