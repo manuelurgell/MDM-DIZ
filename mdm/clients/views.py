@@ -576,7 +576,10 @@ class CodigoPostalRetrieveView(viewsets.GenericViewSet):
     serializer_class = serializers.CodigoPostalSerializer
 
     def list(self, request, *args, **kwargs):
-        codigo = self.request.GET.get('cp')
+        try:
+            codigo = self.request.GET.get('cp')
+        except Exception:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
         try:
             codigoPostal = CodigoPostal.objects.filter(
                 codigo=codigo

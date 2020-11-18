@@ -266,3 +266,96 @@ class FacturaViewSet(viewsets.ModelViewSet):
             data=serializer.data,
             status=status.HTTP_201_CREATED
         )
+
+
+class ValidateCardView(viewsets.ModelViewSet):
+    queryset = Cliente.objects.all()
+    serializer_class = serializers.ClienteSerializer
+
+    def evenDigits(self, card, length, end):
+        sum = 0
+        for i in range(length-2, end, -2):
+            number = eval(card[i])
+            number = number * 2
+            if number > 9:
+                strNumber = str(number)
+                number = eval(strNumber[0]) + eval(strNumber[1])
+            sum += number
+        return sum
+
+    def oddDigits(self, card, length, end):
+        sumOdd = 0
+        print("impares")
+        for i in range(length-3, end, -2):
+            sumOdd += eval(card[i])
+        return sumOdd
+
+    def card_luhn(self, card):
+        length = len(card)
+        if length == 16:
+            sumEven = self.evenDigits(card, length, -1)
+            sumOdd = self.oddDigits(card, length, 0)
+            total = sumEven + sumOdd + int(card[15])
+            if total % 10 == 0:
+                return True
+        elif length == 15:
+            sumEven = self.evenDigits(card, length, 0)
+            sumOdd = self.oddDigits(card, length, -1)
+            total = sumEven + sumOdd + int(card[14])
+            if total % 10 == 0:
+                return True
+
+        else:
+            return False
+
+    def expired_card(self, monthC, yearC):
+        print('chequeo de tarjetas')
+        currentYear = datetime.datetime.today().year
+        currentMonth = datetime.datetime.today().month
+        strYear = str(currentYear)
+        year = strYear[2] + strYear[3]
+        print(year)
+        print(currentMonth)
+        if monthC > currentMonth and yearC >= int(year):
+            print('buena')
+            return True
+        elif monthC <= currentMonth and yearC > int(year):
+            print('buena')
+            return True
+        else:
+            print('vencida')
+            return False
+
+    def create(self, request, *args, **kwargs):
+        noTarjeta = request.data.get('noTarjeta')
+        mesTarjeta = request.data.get('mesTarjeta')
+        anioTarjeta = request.data.get('anioTarjeta')
+
+        checkTarjeta = self.card_luhn(noTarjeta)
+        checkExpired = self.expired_card(int(mesTarjeta), int(anioTarjeta))
+
+        if checkTarjeta and checkExpired:
+            return Response(
+                data={
+                    "noTarjeta": noTarjeta,
+                    "mesTarjeta": mesTarjeta,
+                    "anioTarjeta": anioTarjeta
+                },
+                status=status.HTTP_202_ACCEPTED
+            )
+        else:
+            if not checkTarjeta:
+                return Response(
+                    data={"Response": "CARD_NOT_VALID"},
+                    status=status.HTTP_406_NOT_ACCEPTABLE
+                )
+            if not checkExpired:
+                return Response(
+                    data={"Response": "EXPIRED_CARD"},
+                    status=status.HTTP_406_NOT_ACCEPTABLE
+                )
+
+            return Response(
+                    data={"Response": "ERROR"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
