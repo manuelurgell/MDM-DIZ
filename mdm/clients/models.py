@@ -18,7 +18,7 @@ class NameException(models.Model):
     nombre = models.CharField(max_length=50)
 
     class Meta:
-        verbose_name_plural = "Exceptions"
+        verbose_name_plural = "Excepciones"
 
 
 class Cliente(models.Model):
@@ -64,7 +64,7 @@ class ClienteInfo(models.Model):
     is_main = models.BooleanField(default=False)
 
     class Meta:
-        verbose_name_plural = "Clientes Info"
+        verbose_name_plural = "Clientes_Info"
 
 
 class Carrito(models.Model):
@@ -89,4 +89,4 @@ class CarritoInfo(models.Model):
     cantidadProducto = models.CharField(max_length=30)
 
     class Meta:
-        verbose_name_plural = "Carritos Info"
+        verbose_name_plural = "Carritos_Info"
