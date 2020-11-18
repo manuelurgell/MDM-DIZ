@@ -325,15 +325,13 @@ class ClientViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        cliente_data = {}
-        cliente_data['id'] = cliente.id
-        cliente_data = serializers.ClienteInfoSerializer(
+        serializer = serializers.ClienteInfoSerializer(
             clienteInfo
-        ).data
+        )
 
         return Response(
-            data=cliente_data,
-            status=status.HTTP_202_ACCEPTED
+            data=serializer.data,
+            status=status.HTTP_201_CREATED
         )
 
     def partial_update(self, request, *args, **kwargs):
