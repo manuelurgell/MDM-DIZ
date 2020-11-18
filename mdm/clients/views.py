@@ -296,6 +296,9 @@ class ClientViewSet(viewsets.ModelViewSet):
                 cliente=cliente,
                 telefono=new_cliente_info['telefono'],
                 correo=new_cliente_info['correo'],
+                noTarjeta=new_cliente_info['noTarjeta'],
+                mesTarjeta=new_cliente_info['mesTarjeta'],
+                anioTarjeta=new_cliente_info['anioTarjeta'],
                 calle=new_cliente_info['calle'],
                 colonia=new_cliente_info['colonia'],
                 ciudad=new_cliente_info['ciudad'],
@@ -379,6 +382,21 @@ class ClientViewSet(viewsets.ModelViewSet):
             clienteInfo.correo = new_cliente_info["correo"]
         except Exception:
             clienteInfo.correo = clienteInfo.correo
+
+        try:
+            clienteInfo.noTarjeta = new_cliente_info["noTarjeta"]
+        except Exception:
+            clienteInfo.noTarjeta = clienteInfo.noTarjeta
+
+        try:
+            clienteInfo.mesTarjeta = new_cliente_info["mesTarjeta"]
+        except Exception:
+            clienteInfo.mesTarjeta = clienteInfo.mesTarjeta
+
+        try:
+            clienteInfo.anioTarjeta = new_cliente_info["anioTarjeta"]
+        except Exception:
+            clienteInfo.anioTarjeta = clienteInfo.anioTarjeta
 
         try:
             clienteInfo.calle = new_cliente_info["calle"]
@@ -472,6 +490,13 @@ class ClienteRetrieveView(mixins.ListModelMixin, viewsets.GenericViewSet):
                 data={"Response": "NOT_FOUND"},
                 status=status.HTTP_404_NOT_FOUND
             )
+
+    def create(self, request, *args, **kwargs):
+        id = request.data.get('id')
+        return Response(
+            data={"id": id},
+            status=status.HTTP_202_ACCEPTED
+        )
 
 
 class CarritoViewSet(viewsets.GenericViewSet):

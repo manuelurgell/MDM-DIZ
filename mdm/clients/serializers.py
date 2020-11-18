@@ -29,6 +29,9 @@ class ClienteInfoSerializer(serializers.ModelSerializer):
         fields = [
             'telefono',
             'correo',
+            'noTarjeta',
+            'mesTarjeta',
+            'anioTarjeta',
             'calle',
             'colonia',
             'ciudad',

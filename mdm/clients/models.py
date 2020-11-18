@@ -43,6 +43,15 @@ class ClienteInfo(models.Model):
     correo = models.EmailField(
         max_length=30, null=True, blank=True, default=''
     )
+    noTarjeta = models.CharField(
+        max_length=30, null=True, blank=True, default=''
+    )
+    mesTarjeta = models.CharField(
+        max_length=2, null=True, blank=True, default=''
+    )
+    anioTarjeta = models.CharField(
+        max_length=2, null=True, blank=True, default=''
+    )
     calle = models.CharField(
         max_length=50, null=True, blank=True, default=''
     )
