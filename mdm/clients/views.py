@@ -183,7 +183,7 @@ class ClientViewSet(viewsets.ModelViewSet):
                 if notTheSame:
                     cliente = serializer_cliente.save()
                     try:
-                        ClienteInfo.objects.create(
+                        clienteInfo = ClienteInfo.objects.create(
                             cliente=cliente,
                             telefono=dataClienteInfo["telefono"],
                             correo=dataClienteInfo["correo"],
@@ -193,9 +193,12 @@ class ClientViewSet(viewsets.ModelViewSet):
                         Cliente.objects.filter(id=cliente.id).delete()
                         return Response(status=status.HTTP_400_BAD_REQUEST)
 
-                    serializer = self.get_serializer(
+                    cdata = serializers.CreateClienteSerializer(
                         cliente
-                    )
+                    ).data
+                    cdata['clienteInfo'] = serializers.ClienteInfoSerializer(
+                        clienteInfo
+                    ).data
 
                     # Call SSOT
                     SSOT = True
@@ -240,7 +243,7 @@ class ClientViewSet(viewsets.ModelViewSet):
                         )
 
                     return Response(
-                            data=serializer.data,
+                            data=cdata,
                             status=status.HTTP_201_CREATED
                         )
             else:
@@ -287,26 +290,122 @@ class ClientViewSet(viewsets.ModelViewSet):
             status=status.HTTP_302_FOUND
         )
 
-    def partial_update(self, request, *args, **kwargs):
-        clienteInfo = serializers.ClienteInfoSerializer(
-            data=request.data.get('clienteInfo'),
-            partial=True
-        )
-        dataCliente = request.data.get('cliente')
-        dataCliente['clienteInfo'] = clienteInfo
-        cliente = serializers.UpdateClienteSerializer(
-            data=dataCliente,
-            partial=True
-        )
-        if cliente.is_valid():
-            cliente.save()
+    def update(self, request, *args, **kwargs):
+        try:
+            cliente = self.get_object()
+        except Exception:
             return Response(
-                data=cliente.data,
-                status=status.HTTP_202_ACCEPTED
+                data={"Response": "NOT_FOUND"},
+                status=status.HTTP_404_NOT_FOUND
             )
+
+        print(cliente)
+        cliente_data = serializers.CreateClienteSerializer(
+            cliente
+        ).data
         return Response(
-            data="Error",
-            status=status.HTTP_400_BAD_REQUEST
+            data=cliente_data,
+            status=status.HTTP_202_ACCEPTED
+        )
+
+    def partial_update(self, request, *args, **kwargs):
+        try:
+            cliente = self.get_object()
+            clienteInfo = ClienteInfo.objects.get(
+                cliente=cliente,
+                is_main=True
+            )
+        except Exception:
+            return Response(
+                data={"Response": "NOT_FOUND"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        try:
+            new_cliente = request.data.get('cliente')
+            new_cliente_info = request.data.get('clienteInfo')
+        except Exception:
+            return Response(
+                data={"Response": "NOT_FOUND"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            cliente.nombrePila = new_cliente["nombrePila"]
+        except Exception:
+            cliente.nombrePila = cliente.nombrePila
+
+        try:
+            cliente.apellidoPat = new_cliente["apellidoPat"]
+        except Exception:
+            cliente.apellidoPat = cliente.apellidoPat
+
+        try:
+            cliente.apellidoMat = new_cliente["apellidoMat"]
+        except Exception:
+            cliente.apellidoMat = cliente.apellidoMat
+
+        try:
+            cliente.fechaNac = new_cliente["fechaNac"]
+        except Exception:
+            cliente.fechaNac = cliente.fechaNac
+
+        try:
+            cliente.genero = new_cliente["genero"]
+        except Exception:
+            cliente.genero = cliente.genero
+        cliente.save()
+        cliente_data = serializers.CreateClienteSerializer(
+            cliente
+        ).data
+
+        try:
+            clienteInfo.telefono = new_cliente_info["telefono"]
+        except Exception:
+            clienteInfo.telefono = clienteInfo.telefono
+
+        try:
+            clienteInfo.correo = new_cliente_info["correo"]
+        except Exception:
+            clienteInfo.correo = clienteInfo.correo
+
+        try:
+            clienteInfo.calle = new_cliente_info["calle"]
+        except Exception:
+            clienteInfo.calle = clienteInfo.calle
+
+        try:
+            clienteInfo.colonia = new_cliente_info["colonia"]
+        except Exception:
+            clienteInfo.colonia = clienteInfo.colonia
+
+        try:
+            clienteInfo.ciudad = new_cliente_info["ciudad"]
+        except Exception:
+            clienteInfo.ciudad = clienteInfo.ciudad
+
+        try:
+            clienteInfo.cp = new_cliente_info["cp"]
+        except Exception:
+            clienteInfo.cp = clienteInfo.cp
+
+        try:
+            clienteInfo.estado = new_cliente_info["estado"]
+        except Exception:
+            clienteInfo.estado = clienteInfo.estado
+
+        try:
+            clienteInfo.entreCalles = new_cliente_info["entreCalles"]
+        except Exception:
+            clienteInfo.entreCalles = clienteInfo.entreCalles
+        clienteInfo.save()
+        cliente_data['clienteInfo'] = serializers.ClienteInfoSerializer(
+            clienteInfo
+        ).data
+
+        return Response(
+            data=cliente_data,
+            status=status.HTTP_202_ACCEPTED
         )
 
     def destroy(self, request, *args, **kwargs):
