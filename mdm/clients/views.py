@@ -299,10 +299,38 @@ class ClientViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_404_NOT_FOUND
             )
 
-        print(cliente)
-        cliente_data = serializers.CreateClienteSerializer(
-            cliente
+        try:
+            new_cliente_info = request.data.get('clienteInfo')
+        except Exception:
+            return Response(
+                data={"Response": "BAD_REQUEST"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            clienteInfo = ClienteInfo.objects.create(
+                cliente=cliente,
+                telefono=new_cliente_info['telefono'],
+                correo=new_cliente_info['correo'],
+                calle=new_cliente_info['calle'],
+                colonia=new_cliente_info['colonia'],
+                ciudad=new_cliente_info['ciudad'],
+                cp=new_cliente_info['cp'],
+                estado=new_cliente_info['estado'],
+                entreCalles=new_cliente_info['entreCalles']
+            )
+        except Exception:
+            return Response(
+                data={"Response": "BAD_REQUEST"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        cliente_data = {}
+        cliente_data['id'] = cliente.id
+        cliente_data = serializers.ClienteInfoSerializer(
+            clienteInfo
         ).data
+
         return Response(
             data=cliente_data,
             status=status.HTTP_202_ACCEPTED
@@ -326,7 +354,7 @@ class ClientViewSet(viewsets.ModelViewSet):
             new_cliente_info = request.data.get('clienteInfo')
         except Exception:
             return Response(
-                data={"Response": "NOT_FOUND"},
+                data={"Response": "BAD_REQUEST"},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
