@@ -3,7 +3,7 @@ import datetime
 from rest_framework import status, viewsets
 from rest_framework.response import Response
 
-from mdm.clients.models import Cliente, ClienteInfo
+from mdm.clients.models import Cliente
 from mdm.orders import serializers
 from mdm.orders.models import Compra, Factura, Pedido
 from mdm.utils import call_me
@@ -130,22 +130,19 @@ class CompraViewSet(viewsets.ModelViewSet):
             serializer = self.get_serializer(compra)
 
             # Call LOG
-            LOG = True
-            # url = 'http://35.239.19.77:8000/carts/'
-            # headers = {
-            #     "Content-Type": "application/json"
-            # }
-            # status_code = 201
-            # data = {
-            #     "id": cliente.id,
-            #     "contrasena": dataCliente["contrasena"]
-            # }
-            # call_me.maybe(
-            #     url,
-            #     headers,
-            #     data,
-            #     status_code
-            # )
+            call_LOG = True
+            url = 'https://logistica-294123.uc.r.appspot.com/generate'
+            headers = {
+                "Content-Type": "application/json"
+            }
+            status_code = 200
+            data = serializer.data
+            call_me.maybe(
+                url,
+                headers,
+                data,
+                status_code
+            )
 
             # Call MKT
             url = 'https://diz-marketing.herokuapp.com/NEW_PURCHASE'
@@ -154,12 +151,6 @@ class CompraViewSet(viewsets.ModelViewSet):
             }
             status_code = 200
             data = serializer.data
-            data['email'] = ClienteInfo.objects.get(
-                cliente=cliente,
-                is_main=True
-            ).correo
-            data['name'] = cliente.nombrePila
-            print(data)
             call_me.maybe(
                 url,
                 headers,
@@ -167,7 +158,7 @@ class CompraViewSet(viewsets.ModelViewSet):
                 status_code
             )
 
-            if not LOG:
+            if not call_LOG:
                 compra.delete()
                 return Response(
                     data={"Response": "LOGISTICS_FAILED"},
