@@ -12,6 +12,10 @@ router.register(
 )
 router.register(r'clients', views.ClientViewSet)
 router.register(r'carts', views.CarritoViewSet)
+router.register(
+    r'directions/get',
+    views.CodigoPostalRetrieveView
+)
 
 urlpatterns = [
     path('', include(router.urls))

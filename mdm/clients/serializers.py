@@ -1,7 +1,13 @@
 # serializers.py
 from rest_framework import serializers
 
-from mdm.clients.models import Carrito, CarritoInfo, Cliente, ClienteInfo
+from mdm.clients.models import (
+    Carrito,
+    CarritoInfo,
+    Cliente,
+    ClienteInfo,
+    CodigoPostal
+)
 from mdm.orders.serializers import CompraSerializer
 
 
@@ -94,4 +100,15 @@ class CarritoSerializer(serializers.ModelSerializer):
             'cliente',
             'fecha',
             'carritoInfo'
+        ]
+
+
+class CodigoPostalSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CodigoPostal
+        fields = [
+            'codigo',
+            'colonia',
+            'municipio',
+            'estado'
         ]

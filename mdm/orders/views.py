@@ -3,7 +3,7 @@ import datetime
 from rest_framework import status, viewsets
 from rest_framework.response import Response
 
-from mdm.clients.models import Cliente
+from mdm.clients.models import Cliente, ClienteInfo
 from mdm.orders import serializers
 from mdm.orders.models import Compra, Factura, Pedido
 from mdm.utils import call_me
@@ -130,28 +130,20 @@ class CompraViewSet(viewsets.ModelViewSet):
             serializer = self.get_serializer(compra)
 
             # Call LOG
-            call_LOG = True
             url = 'https://logistica-294123.uc.r.appspot.com/generate'
             headers = {
                 "Content-Type": "application/json"
             }
             status_code = 200
             data = serializer.data
-            call_me.maybe(
-                url,
-                headers,
-                data,
-                status_code
+            clienteInfo = ClienteInfo.objects.get(
+                cliente=cliente,
+                is_main=True
             )
-
-            # Call MKT
-            url = 'https://diz-marketing.herokuapp.com/NEW_PURCHASE'
-            headers = {
-                "Content-Type": "application/json"
-            }
-            status_code = 200
-            data = serializer.data
-            call_me.maybe(
+            data['name'] = clienteInfo.nombrepila
+            data['email'] = clienteInfo.correo
+            print(data)
+            call_LOG = call_me.maybe(
                 url,
                 headers,
                 data,

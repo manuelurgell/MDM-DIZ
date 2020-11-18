@@ -15,29 +15,12 @@ from mdm.clients.models import (
     CarritoInfo,
     Cliente,
     ClienteInfo,
+    CodigoPostal,
     NameException
 )
 from mdm.utils import call_me
 
 # Create your views here
-
-# partial_update para Cliente Info y Cliente Info donde is_main=True
-# Call MKT
-# url = 'http://35.239.19.77:8000/carts/'
-# headers = {
-#     "Content-Type": "application/json"
-# }
-# status_code = 201
-# data = {
-#     "id": cliente.id,
-#     "contrasena": dataCliente["contrasena"]
-# }
-# call_me.maybe(
-#     url,
-#     headers,
-#     data,
-#     status_code
-# )
 
 
 class ClientViewSet(viewsets.ModelViewSet):
@@ -201,41 +184,42 @@ class ClientViewSet(viewsets.ModelViewSet):
                     ).data
 
                     # Call SSOT
-                    SSOT = True
-                    # url = 'http://35.239.19.77:8000/carts/'
-                    # headers = {
-                    #     "Content-Type": "application/json"
-                    # }
-                    # status_code = 201
-                    # data = {
-                    #     "id": cliente.id,
-                    #     "contrasena": request.data.get('contrasena')
-                    # }
-                    # SSOT = call_me.maybe(
-                    #     url,
-                    #     headers,
-                    #     data,
-                    #     status_code
-                    # )
-
-                    # Call MKT
-                    url = 'https://diz-marketing.herokuapp.com/NEW_USER'
+                    url = (
+                        'https://signonservice-difbz2ztya-uc.a.run.app/newuser'
+                    )
                     headers = {
                         "Content-Type": "application/json"
                     }
                     status_code = 200
                     data = {
-                        "nombrePila": dataCliente["nombrePila"],
-                        "correo": dataClienteInfo["correo"]
+                        "uid": str(cliente.id),
+                        "password": request.data.get('contrasena')
                     }
-                    call_me.maybe(
+                    SSOT = call_me.maybe(
                         url,
                         headers,
                         data,
                         status_code
                     )
 
-                    if not SSOT:
+                    if SSOT:
+                        # Call MKT
+                        url = 'https://diz-marketing.herokuapp.com/NEW_USER'
+                        headers = {
+                            "Content-Type": "application/json"
+                        }
+                        status_code = 200
+                        data = {
+                            "nombrePila": dataCliente["nombrePila"],
+                            "correo": dataClienteInfo["correo"]
+                        }
+                        call_me.maybe(
+                            url,
+                            headers,
+                            data,
+                            status_code
+                        )
+                    else:
                         cliente.delete()
                         return Response(
                             data={"Response": "SSOT_FAILED"},
@@ -585,3 +569,29 @@ class CarritoViewSet(viewsets.GenericViewSet):
             data=data,
             status=status.HTTP_302_FOUND
         )
+
+
+class CodigoPostalRetrieveView(viewsets.GenericViewSet):
+    queryset = CodigoPostal.objects.all()
+    serializer_class = serializers.CodigoPostalSerializer
+
+    def list(self, request, *args, **kwargs):
+        codigo = self.request.GET.get('cp')
+        print(codigo)
+        codigoPostal = CodigoPostal.objects.filter(
+            codigo=codigo
+        )
+        serializer = self.get_serializer(
+            codigoPostal
+        )
+        print(serializer.data)
+        try:
+            return Response(
+                data=serializer.data,
+                status=status.HTTP_302_FOUND
+            )
+        except Exception:
+            return Response(
+                data={"Response": "NOT_FOUND"},
+                status=status.HTTP_404_NOT_FOUND
+            )
