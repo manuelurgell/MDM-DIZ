@@ -327,10 +327,11 @@ class ClientViewSet(viewsets.ModelViewSet):
 
         serializer = serializers.ClienteInfoSerializer(
             clienteInfo
-        )
+        ).data
+        serializer['id'] = clienteInfo.cliente.id
 
         return Response(
-            data=serializer.data,
+            data=serializer,
             status=status.HTTP_201_CREATED
         )
 
