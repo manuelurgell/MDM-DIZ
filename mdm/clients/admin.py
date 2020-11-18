@@ -5,6 +5,7 @@ from mdm.clients.models import (
     CarritoInfo,
     Cliente,
     ClienteInfo,
+    CodigoPostal,
     NameException
 )
 
@@ -14,6 +15,14 @@ class NameExceptionAdmin(admin.ModelAdmin):
     list_display = (
         'id',
         'nombre'
+    )
+
+
+class CodigoPostalAdmin(admin.ModelAdmin):
+    model = CodigoPostal
+    list_display = (
+        'id',
+        'codigo'
     )
 
 
@@ -58,6 +67,7 @@ class CarritoInfoAdmin(admin.ModelAdmin):
 
 # Register tour models here
 admin.site.register(NameException, NameExceptionAdmin)
+admin.site.register(CodigoPostal, CodigoPostalAdmin)
 admin.site.register(Cliente, ClienteAdmin)
 admin.site.register(ClienteInfo, ClienteInfoAdmin)
 admin.site.register(Carrito, CarritoAdmin)

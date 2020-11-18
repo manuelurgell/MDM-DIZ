@@ -3,6 +3,13 @@ from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
 
 
+class CodigoPostal(models.Model):
+    codigo = models.CharField(max_length=7)
+    colonia = models.CharField(max_length=100)
+    municipio = models.CharField(max_length=50)
+    estado = models.CharField(max_length=50)
+
+
 class NameException(models.Model):
     nombre = models.CharField(max_length=50)
 
