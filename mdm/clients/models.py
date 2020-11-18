@@ -9,6 +9,10 @@ class CodigoPostal(models.Model):
     municipio = models.CharField(max_length=50)
     estado = models.CharField(max_length=50)
 
+    class Meta:
+        verbose_name_plural = "Codigos postales"
+        ordering = ['id']
+
 
 class NameException(models.Model):
     nombre = models.CharField(max_length=50)
