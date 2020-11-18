@@ -3,10 +3,10 @@ import datetime
 from rest_framework import status, viewsets
 from rest_framework.response import Response
 
-# from mdm.clients.models import Cliente, ClienteInfo
+from mdm.clients.models import Cliente, ClienteInfo
 from mdm.orders import serializers
 from mdm.orders.models import Compra, Factura, Pedido
-# from mdm.utils import call_me
+from mdm.utils import call_me
 
 # Create your views here.
 
