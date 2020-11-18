@@ -3,10 +3,10 @@ import datetime
 from rest_framework import status, viewsets
 from rest_framework.response import Response
 
-from mdm.clients.models import Cliente, ClienteInfo
+# from mdm.clients.models import Cliente, ClienteInfo
 from mdm.orders import serializers
 from mdm.orders.models import Compra, Factura, Pedido
-from mdm.utils import call_me
+# from mdm.utils import call_me
 
 # Create your views here.
 
@@ -129,6 +129,7 @@ class CompraViewSet(viewsets.ModelViewSet):
 
             serializer = self.get_serializer(compra)
 
+            """
             # Call LOG
             url = 'https://logistica-294123.uc.r.appspot.com/generate'
             headers = {
@@ -140,7 +141,7 @@ class CompraViewSet(viewsets.ModelViewSet):
                 cliente=cliente,
                 is_main=True
             )
-            data['name'] = clienteInfo.nombrepila
+            data['name'] = cliente.nombrePila
             data['email'] = clienteInfo.correo
             print(data)
             call_LOG = call_me.maybe(
@@ -156,6 +157,7 @@ class CompraViewSet(viewsets.ModelViewSet):
                     data={"Response": "LOGISTICS_FAILED"},
                     status=status.HTTP_417_EXPECTATION_FAILED
                 )
+            """
 
             return Response(
                 data=serializer.data,

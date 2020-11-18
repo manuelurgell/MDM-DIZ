@@ -577,19 +577,24 @@ class CodigoPostalRetrieveView(viewsets.GenericViewSet):
 
     def list(self, request, *args, **kwargs):
         codigo = self.request.GET.get('cp')
-        print(codigo)
-        codigoPostal = CodigoPostal.objects.filter(
-            codigo=codigo
-        )
-        serializer = self.get_serializer(
-            codigoPostal
-        )
-        print(serializer.data)
         try:
-            return Response(
-                data=serializer.data,
-                status=status.HTTP_302_FOUND
+            codigoPostal = CodigoPostal.objects.filter(
+                codigo=codigo
             )
+            if codigoPostal.exists():
+                serializer = self.get_serializer(
+                    codigoPostal,
+                    many=True
+                )
+                return Response(
+                    data=serializer.data,
+                    status=status.HTTP_302_FOUND
+                )
+            else:
+                return Response(
+                    data={"Response": "NOT_FOUND"},
+                    status=status.HTTP_404_NOT_FOUND
+                )
         except Exception:
             return Response(
                 data={"Response": "NOT_FOUND"},
