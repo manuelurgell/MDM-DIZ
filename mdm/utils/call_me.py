@@ -10,7 +10,7 @@ def maybe(url, headers, data, status_code):
     )
 
     print(response.status_code)
-    print(response.json())
+    # print(response.json())
 
     if response.status_code == status_code:
         return True

@@ -216,21 +216,21 @@ class ClientViewSet(viewsets.ModelViewSet):
                     # )
 
                     # Call MKT
-                    # url = 'http://35.239.19.77:8000/carts/'
-                    # headers = {
-                    #     "Content-Type": "application/json"
-                    # }
-                    # status_code = 201
-                    # data = {
-                    #     "id": cliente.id,
-                    #     "contrasena": dataCliente["contrasena"]
-                    # }
-                    # call_me.maybe(
-                    #     url,
-                    #     headers,
-                    #     data,
-                    #     status_code
-                    # )
+                    url = 'https://diz-marketing.herokuapp.com/NEW_USER'
+                    headers = {
+                        "Content-Type": "application/json"
+                    }
+                    status_code = 200
+                    data = {
+                        "nombrePila": dataCliente["nombrePila"],
+                        "correo": dataClienteInfo["correo"]
+                    }
+                    call_me.maybe(
+                        url,
+                        headers,
+                        data,
+                        status_code
+                    )
 
                     if not SSOT:
                         cliente.delete()
@@ -298,7 +298,6 @@ class ClientViewSet(viewsets.ModelViewSet):
             data=dataCliente,
             partial=True
         )
-        print(cliente.data)
         if cliente.is_valid():
             cliente.save()
             return Response(
@@ -415,21 +414,24 @@ class CarritoViewSet(viewsets.GenericViewSet):
         serializer = self.get_serializer(carrito)
 
         # Call MKT
-        # url = 'http://35.239.19.77:8000/carts/'
-        # headers = {
-        #     "Content-Type": "application/json"
-        # }
-        # status_code = 201
-        # data = {
-        #     "id": cliente.id,
-        #     "contrasena": dataCliente["contrasena"]
-        # }
-        # call_me.maybe(
-        #     url,
-        #     headers,
-        #     data,
-        #     status_code
-        # )
+        url = 'https://diz-marketing.herokuapp.com/ITEMS_LEFT'
+        headers = {
+            "Content-Type": "application/json"
+        }
+        status_code = 200
+        data = serializer.data
+        data['email'] = ClienteInfo.objects.get(
+            cliente=cliente,
+            is_main=True
+        ).correo
+        data['name'] = cliente.nombrePila
+        print(data)
+        call_me.maybe(
+            url,
+            headers,
+            data,
+            status_code
+        )
 
         return Response(
             data=serializer.data,
