@@ -504,6 +504,30 @@ class ClienteRetrieveView(mixins.ListModelMixin, viewsets.GenericViewSet):
             status=status.HTTP_202_ACCEPTED
         )
 
+    def retrieve(self, request, *args, **kwargs):
+        return Response(
+            data={"BOSS ERROR": "XIME NO ESTÁ SATISFECHA"},
+            status=status.HTTP_417_EXPECTATION_FAILED
+        )
+
+    def update(self, request, *args, **kwargs):
+        return Response(
+            data={"BOSS ERROR": "XIME NO ESTÁ SATISFECHA"},
+            status=status.HTTP_417_EXPECTATION_FAILED
+        )
+
+    def partial_update(self, request, *args, **kwargs):
+        return Response(
+            data={"BOSS ERROR": "XIME NO ESTÁ SATISFECHA"},
+            status=status.HTTP_417_EXPECTATION_FAILED
+        )
+
+    def destroy(self, request, *args, **kwargs):
+        return Response(
+            data={"BOSS ERROR": "XIME NO ESTÁ SATISFECHA"},
+            status=status.HTTP_417_EXPECTATION_FAILED
+        )
+
 
 class CarritoViewSet(viewsets.GenericViewSet):
     'List, create, retreive, update or delete carritos'
@@ -516,6 +540,12 @@ class CarritoViewSet(viewsets.GenericViewSet):
             return True
         except Carrito.DoesNotExist:
             return False
+
+    def list(self, request, *args, **kwargs):
+        return Response(
+            data={"BOSS ERROR": "XIME NO ESTÁ SATISFECHA"},
+            status=status.HTTP_417_EXPECTATION_FAILED
+        )
 
     def create(self, request, *args, **kwargs):
         id = request.data.get('id')
@@ -601,6 +631,24 @@ class CarritoViewSet(viewsets.GenericViewSet):
             status=status.HTTP_302_FOUND
         )
 
+    def update(self, request, *args, **kwargs):
+        return Response(
+            data={"BOSS ERROR": "XIME NO ESTÁ SATISFECHA"},
+            status=status.HTTP_417_EXPECTATION_FAILED
+        )
+
+    def partial_update(self, request, *args, **kwargs):
+        return Response(
+            data={"BOSS ERROR": "XIME NO ESTÁ SATISFECHA"},
+            status=status.HTTP_417_EXPECTATION_FAILED
+        )
+
+    def destroy(self, request, *args, **kwargs):
+        return Response(
+            data={"BOSS ERROR": "XIME NO ESTÁ SATISFECHA"},
+            status=status.HTTP_417_EXPECTATION_FAILED
+        )
+
 
 class CodigoPostalRetrieveView(viewsets.GenericViewSet):
     queryset = CodigoPostal.objects.all()
@@ -634,3 +682,33 @@ class CodigoPostalRetrieveView(viewsets.GenericViewSet):
                 data={"Response": "NOT_FOUND"},
                 status=status.HTTP_404_NOT_FOUND
             )
+
+    def create(self, request, *args, **kwargs):
+        return Response(
+            data={"BOSS ERROR": "XIME NO ESTÁ SATISFECHA"},
+            status=status.HTTP_417_EXPECTATION_FAILED
+        )
+
+    def retrieve(self, request, *args, **kwargs):
+        return Response(
+            data={"BOSS ERROR": "XIME NO ESTÁ SATISFECHA"},
+            status=status.HTTP_417_EXPECTATION_FAILED
+        )
+
+    def update(self, request, *args, **kwargs):
+        return Response(
+            data={"BOSS ERROR": "XIME NO ESTÁ SATISFECHA"},
+            status=status.HTTP_417_EXPECTATION_FAILED
+        )
+
+    def partial_update(self, request, *args, **kwargs):
+        return Response(
+            data={"BOSS ERROR": "XIME NO ESTÁ SATISFECHA"},
+            status=status.HTTP_417_EXPECTATION_FAILED
+        )
+
+    def destroy(self, request, *args, **kwargs):
+        return Response(
+            data={"BOSS ERROR": "XIME NO ESTÁ SATISFECHA"},
+            status=status.HTTP_417_EXPECTATION_FAILED
+        )
