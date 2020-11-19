@@ -13,9 +13,15 @@ from mdm.orders.models import Compra, Factura, Pedido
 
 
 class CompraViewSet(viewsets.ModelViewSet):
-    '''List, create, retrieve, update, partial_update or delete compras'''
+    '''List, create, retrieve, update, partial_update or destroy compras'''
     queryset = Compra.objects.all()
     serializer_class = serializers.CompraSerializer
+
+    def list(self, request, *args, **kwargs):
+        return Response(
+            data={"BOSS ERROR": "XIME NO ESTÁ SATISFECHA"},
+            status=status.HTTP_417_EXPECTATION_FAILED
+        )
 
     def create(self, request, *args, **kwargs):
         try:
@@ -128,6 +134,24 @@ class CompraViewSet(viewsets.ModelViewSet):
             status=status.HTTP_302_FOUND
         )
 
+    def update(self, request, *args, **kwargs):
+        return Response(
+            data={"BOSS ERROR": "XIME NO ESTÁ SATISFECHA"},
+            status=status.HTTP_417_EXPECTATION_FAILED
+        )
+
+    def partial_update(self, request, *args, **kwargs):
+        return Response(
+            data={"BOSS ERROR": "XIME NO ESTÁ SATISFECHA"},
+            status=status.HTTP_417_EXPECTATION_FAILED
+        )
+
+    def destroy(self, request, *args, **kwargs):
+        return Response(
+            data={"BOSS ERROR": "XIME NO ESTÁ SATISFECHA"},
+            status=status.HTTP_417_EXPECTATION_FAILED
+        )
+
 
 class FacturaViewSet(viewsets.ModelViewSet):
     '''List, create, retrieve, update, partial_update or delete compras'''
@@ -140,6 +164,12 @@ class FacturaViewSet(viewsets.ModelViewSet):
             return True
         except Factura.DoesNotExist:
             return False
+
+    def list(self, request, *args, **kwargs):
+        return Response(
+            data={"BOSS ERROR": "XIME NO ESTÁ SATISFECHA"},
+            status=status.HTTP_417_EXPECTATION_FAILED
+        )
 
     def create(self, request, *args, **kwargs):
         data = request.data
@@ -197,6 +227,30 @@ class FacturaViewSet(viewsets.ModelViewSet):
         return Response(
             data=serializer.data,
             status=status.HTTP_201_CREATED
+        )
+
+    def retrieve(self, request, *args, **kwargs):
+        return Response(
+            data={"BOSS ERROR": "XIME NO ESTÁ SATISFECHA"},
+            status=status.HTTP_417_EXPECTATION_FAILED
+        )
+
+    def update(self, request, *args, **kwargs):
+        return Response(
+            data={"BOSS ERROR": "XIME NO ESTÁ SATISFECHA"},
+            status=status.HTTP_417_EXPECTATION_FAILED
+        )
+
+    def partial_update(self, request, *args, **kwargs):
+        return Response(
+            data={"BOSS ERROR": "XIME NO ESTÁ SATISFECHA"},
+            status=status.HTTP_417_EXPECTATION_FAILED
+        )
+
+    def destroy(self, request, *args, **kwargs):
+        return Response(
+            data={"BOSS ERROR": "XIME NO ESTÁ SATISFECHA"},
+            status=status.HTTP_417_EXPECTATION_FAILED
         )
 
 
@@ -257,6 +311,12 @@ class ValidateCardView(viewsets.ModelViewSet):
             else:
                 return False
 
+    def list(self, request, *args, **kwargs):
+        return Response(
+            data={"BOSS ERROR": "XIME NO ESTÁ SATISFECHA"},
+            status=status.HTTP_417_EXPECTATION_FAILED
+        )
+
     def create(self, request, *args, **kwargs):
         noTarjeta = request.data.get('noTarjeta')
         mesTarjeta = request.data.get('mesTarjeta')
@@ -290,3 +350,27 @@ class ValidateCardView(viewsets.ModelViewSet):
                     data={"Response": "ERROR"},
                     status=status.HTTP_400_BAD_REQUEST
                 )
+
+    def retrieve(self, request, *args, **kwargs):
+        return Response(
+            data={"BOSS ERROR": "XIME NO ESTÁ SATISFECHA"},
+            status=status.HTTP_417_EXPECTATION_FAILED
+        )
+
+    def update(self, request, *args, **kwargs):
+        return Response(
+            data={"BOSS ERROR": "XIME NO ESTÁ SATISFECHA"},
+            status=status.HTTP_417_EXPECTATION_FAILED
+        )
+
+    def partial_update(self, request, *args, **kwargs):
+        return Response(
+            data={"BOSS ERROR": "XIME NO ESTÁ SATISFECHA"},
+            status=status.HTTP_417_EXPECTATION_FAILED
+        )
+
+    def destroy(self, request, *args, **kwargs):
+        return Response(
+            data={"BOSS ERROR": "XIME NO ESTÁ SATISFECHA"},
+            status=status.HTTP_417_EXPECTATION_FAILED
+        )

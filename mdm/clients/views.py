@@ -126,7 +126,7 @@ class ClientViewSet(viewsets.ModelViewSet):
             check1 = self.Duplicate(email)
             if check and check1 and check2 and validName and checkGender:
                 duplicateName = self.CheckDuplicate(
-                    clientName, clientLast, birth, gender, phone
+                    clientName, clientLast, birth, gender
                 )
                 if duplicateName != "0":
                     existingClientInfo = ClienteInfo.objects.get(
