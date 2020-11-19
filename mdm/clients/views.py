@@ -107,23 +107,37 @@ class ClientViewSet(viewsets.ModelViewSet):
         return temporaryId
 
     def create(self, request, *args, **kwargs):
-        dataCliente = request.data.get('cliente')
-        serializer_cliente = serializers.CreateClienteSerializer(
-            data=dataCliente
-        )
+        try:
+            dataCliente = request.data.get('cliente')
+            serializer_cliente = serializers.CreateClienteSerializer(
+                data=dataCliente
+            )
+        except Exception:
+            return Response(
+                data={"Response": "BAD_REQUEST"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
         if serializer_cliente.is_valid():
-            dataClienteInfo = request.data.get('clienteInfo')
-            clientName = dataCliente["nombrePila"]
-            clientLast = dataCliente["apellidoPat"]
-            validName = self.ValidateName(clientName)
-            phone = dataClienteInfo["telefono"]
-            birth = dataCliente["fechaNac"]
-            gender = dataCliente["genero"]
-            checkGender = self.validateGender(clientName, gender)
-            check = self.ValidatePhone(phone)
-            email = dataClienteInfo["correo"]
-            check2 = self.ValidateEmail(email)
-            check1 = self.Duplicate(email)
+            try:
+                dataClienteInfo = request.data.get('clienteInfo')
+                clientName = dataCliente["nombrePila"]
+                clientLast = dataCliente["apellidoPat"]
+                validName = self.ValidateName(clientName)
+                phone = dataClienteInfo["telefono"]
+                birth = dataCliente["fechaNac"]
+                gender = dataCliente["genero"]
+                checkGender = self.validateGender(clientName, gender)
+                check = self.ValidatePhone(phone)
+                email = dataClienteInfo["correo"]
+                check2 = self.ValidateEmail(email)
+                check1 = self.Duplicate(email)
+            except Exception:
+                return Response(
+                    data={"Response": "BAD_REQUEST"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
             if check and check1 and check2 and validName and checkGender:
                 duplicateName = self.CheckDuplicate(
                     clientName, clientLast, birth, gender
@@ -174,7 +188,10 @@ class ClientViewSet(viewsets.ModelViewSet):
                         )
                     except Exception:
                         Cliente.objects.filter(id=cliente.id).delete()
-                        return Response(status=status.HTTP_400_BAD_REQUEST)
+                        return Response(
+                            data={"Response": "BAD_REQUEST"},
+                            status=status.HTTP_400_BAD_REQUEST
+                        )
 
                     cdata = serializers.CreateClienteSerializer(
                         cliente
@@ -227,9 +244,9 @@ class ClientViewSet(viewsets.ModelViewSet):
                         )
 
                     return Response(
-                            data=cdata,
-                            status=status.HTTP_201_CREATED
-                        )
+                        data=cdata,
+                        status=status.HTTP_201_CREATED
+                    )
             else:
                 if not validName:
                     return Response(
@@ -257,7 +274,10 @@ class ClientViewSet(viewsets.ModelViewSet):
                         status=status.HTTP_406_NOT_ACCEPTABLE
                     )
         else:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                data={"Response": "BAD_REQUEST"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
     def retrieve(self, request, *args, **kwargs):
         try:
@@ -509,7 +529,14 @@ class ClienteRetrieveView(mixins.ListModelMixin, viewsets.GenericViewSet):
             )
 
     def create(self, request, *args, **kwargs):
-        id = request.data.get('id')
+        try:
+            id = request.data.get('id')
+        except Exception:
+            return Response(
+                data={"Response": "BAD_REQUEST"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
         return Response(
             data={"id": id},
             status=status.HTTP_202_ACCEPTED
@@ -559,7 +586,13 @@ class CarritoViewSet(viewsets.GenericViewSet):
         )
 
     def create(self, request, *args, **kwargs):
-        id = request.data.get('id')
+        try:
+            id = request.data.get('id')
+        except Exception:
+            return Response(
+                data={"Response": "BAD_REQUEST"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
         try:
             cliente = Cliente.objects.get(id=id, is_deleted=False)
         except Exception:
@@ -669,7 +702,10 @@ class CodigoPostalRetrieveView(viewsets.GenericViewSet):
         try:
             codigo = self.request.GET.get('cp')
         except Exception:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                data={"Response": "BAD_REQUEST"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
         try:
             codigoPostal = CodigoPostal.objects.filter(
                 codigo=codigo

@@ -172,8 +172,15 @@ class FacturaViewSet(viewsets.ModelViewSet):
         )
 
     def create(self, request, *args, **kwargs):
-        data = request.data
-        compra_id = data["compra_id"]
+        try:
+            data = request.data
+            compra_id = data["compra_id"]
+        except Exception:
+            return Response(
+                data={"Response": "BAD_REQUEST"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
         try:
             compra = Compra.objects.get(
                 id=compra_id
@@ -318,9 +325,15 @@ class ValidateCardView(viewsets.ModelViewSet):
         )
 
     def create(self, request, *args, **kwargs):
-        noTarjeta = request.data.get('noTarjeta')
-        mesTarjeta = request.data.get('mesTarjeta')
-        anioTarjeta = request.data.get('anioTarjeta')
+        try:
+            noTarjeta = request.data.get('noTarjeta')
+            mesTarjeta = request.data.get('mesTarjeta')
+            anioTarjeta = request.data.get('anioTarjeta')
+        except Exception:
+            return Response(
+                data={"Response": "BAD_REQUEST"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
         checkTarjeta = self.card_luhn(noTarjeta)
         checkExpired = self.expired_card(int(mesTarjeta), int(anioTarjeta))
