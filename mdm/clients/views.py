@@ -473,24 +473,29 @@ class ClienteRetrieveView(mixins.ListModelMixin, viewsets.GenericViewSet):
     serializer_class = serializers.ClienteSerializer
 
     def list(self, request, *args, **kwargs):
-        correo = self.request.GET.get('correo')
         try:
-            clientesInfo = ClienteInfo.objects.filter(
+            correo = self.request.GET.get('correo')
+        except Exception:
+            return Response(
+                data={"Response": "BAD_REQUEST"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        try:
+            clienteInfo = ClienteInfo.objects.get(
                 correo=correo,
                 is_main=True
             )
-            cliente = Cliente.objects
-            for clienteInfo in clientesInfo:
-                cliente = clienteInfo.cliente
-                if not cliente.is_deleted:
-                    return Response(
-                        data={"Response": cliente.id},
-                        status=status.HTTP_302_FOUND
-                    )
-            return Response(
-                data={"Response": "NOT_FOUND"},
-                status=status.HTTP_404_NOT_FOUND
-            )
+            cliente = clienteInfo.cliente
+            if not cliente.is_deleted:
+                return Response(
+                    data={"Response": cliente.id},
+                    status=status.HTTP_302_FOUND
+                )
+            else:
+                return Response(
+                    data={"Response": "NOT_FOUND"},
+                    status=status.HTTP_404_NOT_FOUND
+                )
         except Exception:
             return Response(
                 data={"Response": "NOT_FOUND"},
