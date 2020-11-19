@@ -9,7 +9,7 @@ class Compra(models.Model):
         on_delete=models.CASCADE,
         related_name='compra'
     )
-    noTarjeta = models.CharField(max_length=30)
+    noTarjeta = models.CharField(max_length=30, default=None)
     mesTarjeta = models.CharField(max_length=2, default=None)
     anioTarjeta = models.CharField(max_length=2, default=None)
     fecha = models.DateTimeField(auto_now_add=True)

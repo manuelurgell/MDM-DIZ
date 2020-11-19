@@ -229,27 +229,33 @@ class ValidateCardView(viewsets.ModelViewSet):
             total = sumEven + sumOdd + int(card[15])
             if total % 10 == 0:
                 return True
+            else:
+                return False
         elif length == 15:
             sumEven = self.evenDigits(card, length, 0)
             sumOdd = self.oddDigits(card, length, -1)
             total = sumEven + sumOdd + int(card[14])
             if total % 10 == 0:
                 return True
-
+            else:
+                return False
         else:
             return False
 
     def expired_card(self, monthC, yearC):
-        currentYear = datetime.datetime.today().year
+        year = datetime.datetime.today().year
         currentMonth = datetime.datetime.today().month
-        strYear = str(currentYear)
-        year = strYear[2] + strYear[3]
-        if monthC > currentMonth and yearC >= int(year):
-            return True
-        elif monthC <= currentMonth and yearC > int(year):
-            return True
+        currentYear = int(str(year)[2] + str(year)[3])
+        if monthC > currentMonth:
+            if yearC >= currentYear:
+                return True
+            else:
+                return False
         else:
-            return False
+            if yearC > currentYear:
+                return True
+            else:
+                return False
 
     def create(self, request, *args, **kwargs):
         noTarjeta = request.data.get('noTarjeta')

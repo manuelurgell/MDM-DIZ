@@ -32,7 +32,7 @@ class DuplicateTestCase(TestCase):
         cliente = self.cliente
 
         Carrito.objects.create(
-            cliente=self.cliente
+            cliente=cliente
         )
 
         self.assertEqual(
