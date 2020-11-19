@@ -92,7 +92,7 @@ class ClientViewSet(viewsets.ModelViewSet):
             duplicate = True
         return duplicate
 
-    def CheckDuplicate(self, clientName, clientLast, birth, gender, phone):
+    def CheckDuplicate(self, clientName, clientLast, birth, gender):
         try:
             temporaryClient = Cliente.objects.get(
                 nombrePila=clientName,
@@ -325,10 +325,16 @@ class ClientViewSet(viewsets.ModelViewSet):
     def partial_update(self, request, *args, **kwargs):
         try:
             cliente = self.get_object()
-            clienteInfo = ClienteInfo.objects.get(
-                cliente=cliente,
-                is_main=True
-            )
+            if not cliente.is_deleted:
+                clienteInfo = ClienteInfo.objects.get(
+                    cliente=cliente,
+                    is_main=True
+                )
+            else:
+                return Response(
+                    data={"Response": "NOT_FOUND"},
+                    status=status.HTTP_404_NOT_FOUND
+                )
         except Exception:
             return Response(
                 data={"Response": "NOT_FOUND"},

@@ -3,10 +3,11 @@ import datetime
 from rest_framework import status, viewsets
 from rest_framework.response import Response
 
-from mdm.clients.models import Cliente, ClienteInfo
+from mdm.clients.models import Cliente
+# , ClienteInfo
 from mdm.orders import serializers
 from mdm.orders.models import Compra, Factura, Pedido
-from mdm.utils import call_me
+# from mdm.utils import call_me
 
 # Create your views here.
 
@@ -216,7 +217,6 @@ class ValidateCardView(viewsets.ModelViewSet):
 
     def oddDigits(self, card, length, end):
         sumOdd = 0
-        print("impares")
         for i in range(length-3, end, -2):
             sumOdd += eval(card[i])
         return sumOdd
@@ -240,21 +240,15 @@ class ValidateCardView(viewsets.ModelViewSet):
             return False
 
     def expired_card(self, monthC, yearC):
-        print('chequeo de tarjetas')
         currentYear = datetime.datetime.today().year
         currentMonth = datetime.datetime.today().month
         strYear = str(currentYear)
         year = strYear[2] + strYear[3]
-        print(year)
-        print(currentMonth)
         if monthC > currentMonth and yearC >= int(year):
-            print('buena')
             return True
         elif monthC <= currentMonth and yearC > int(year):
-            print('buena')
             return True
         else:
-            print('vencida')
             return False
 
     def create(self, request, *args, **kwargs):
