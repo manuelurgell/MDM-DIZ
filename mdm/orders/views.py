@@ -245,7 +245,7 @@ class ValidateCardView(viewsets.ModelViewSet):
     def expired_card(self, monthC, yearC):
         year = datetime.datetime.today().year
         currentMonth = datetime.datetime.today().month
-        currentYear = int(str(year)[2] + str(year)[3])
+        currentYear = int(str(year)[2:4])
         if monthC > currentMonth:
             if yearC >= currentYear:
                 return True
