@@ -283,6 +283,12 @@ class ClientViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_404_NOT_FOUND
             )
 
+        if cliente.is_deleted:
+            return Response(
+                data={"Response": "NOT_FOUND"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
         try:
             new_cliente_info = request.data.get('clienteInfo')
         except Exception:
