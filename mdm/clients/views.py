@@ -340,7 +340,7 @@ class ClientViewSet(viewsets.ModelViewSet):
 
         serializer = {}
         serializer['id'] = clienteInfo.cliente.id
-        serializer = serializers.ClienteInfoSerializer(
+        serializer['clienteInfo'] = serializers.ClienteInfoSerializer(
             clienteInfo
         ).data
 
