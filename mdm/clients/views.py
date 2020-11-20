@@ -537,9 +537,146 @@ class ClienteRetrieveView(mixins.ListModelMixin, viewsets.GenericViewSet):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
+        try:
+            cliente = Cliente.objects.get(id=id)
+            if cliente.is_deleted:
+                return Response(
+                    data={"Response": "NOT_FOUND"},
+                    status=status.HTTP_404_NOT_FOUND
+                )
+        except Exception:
+            return Response(
+                data={"Response": "NOT_FOUND"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        try:
+            new_cliente_info = request.data.get('clienteInfo')
+            data = {}
+            data["id"] = id
+        except Exception:
+            return Response(
+                data={"Response": "BAD_REQUEST"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            clienteInfo = ClienteInfo.objects.get(
+                cliente=cliente,
+                is_main=False,
+                telefono=new_cliente_info["telefono"]
+            )
+            clienteInfo.telefono = ""
+            clienteInfo.save()
+            data["telefono"] = ""
+        except Exception:
+            print("NO_telefono")
+
+        try:
+            clienteInfo = ClienteInfo.objects.get(
+                cliente=cliente,
+                is_main=False,
+                correo=new_cliente_info["correo"]
+            )
+            clienteInfo.correo = ""
+            clienteInfo.save()
+            data["correo"] = ""
+        except Exception:
+            print("NO_correo")
+
+        try:
+            clienteInfo = ClienteInfo.objects.get(
+                cliente=cliente,
+                is_main=False,
+                noTarjeta=new_cliente_info["noTarjeta"],
+                mesTarjeta=new_cliente_info["mesTarjeta"],
+                anioTarjeta=new_cliente_info["anioTarjeta"]
+            )
+            clienteInfo.noTarjeta = ""
+            clienteInfo.mesTarjeta = ""
+            clienteInfo.anioTarjeta = ""
+            clienteInfo.save()
+            data["noTarjeta"] = ""
+            data["mesTarjeta"] = ""
+            data["anioTarjeta"] = ""
+        except Exception:
+            print("NO_Tarjeta")
+
+        try:
+            clienteInfo = ClienteInfo.objects.get(
+                cliente=cliente,
+                is_main=False,
+                calle=new_cliente_info["calle"]
+            )
+            clienteInfo.calle = ""
+            clienteInfo.save()
+            data["calle"] = ""
+        except Exception:
+            print("NO_calle")
+
+        try:
+            clienteInfo = ClienteInfo.objects.get(
+                cliente=cliente,
+                is_main=False,
+                colonia=new_cliente_info["colonia"]
+            )
+            clienteInfo.colonia = ""
+            clienteInfo.save()
+            data["colonia"] = ""
+        except Exception:
+            print("NO_colonia")
+
+        try:
+            clienteInfo = ClienteInfo.objects.get(
+                cliente=cliente,
+                is_main=False,
+                ciudad=new_cliente_info["ciudad"]
+            )
+            clienteInfo.ciudad = ""
+            clienteInfo.save()
+            data["ciudad"] = ""
+        except Exception:
+            print("NO_ciudad")
+
+        try:
+            clienteInfo = ClienteInfo.objects.get(
+                cliente=cliente,
+                is_main=False,
+                cp=new_cliente_info["cp"]
+            )
+            clienteInfo.cp = ""
+            clienteInfo.save()
+            data["cp"] = ""
+        except Exception:
+            print("NO_cp")
+
+        try:
+            clienteInfo = ClienteInfo.objects.get(
+                cliente=cliente,
+                is_main=False,
+                estado=new_cliente_info["estado"]
+            )
+            clienteInfo.estado = ""
+            clienteInfo.save()
+            data["estado"] = ""
+        except Exception:
+            print("NO_estado")
+
+        try:
+            clienteInfo = ClienteInfo.objects.get(
+                cliente=cliente,
+                is_main=False,
+                entreCalles=new_cliente_info["entreCalles"]
+            )
+            clienteInfo.entreCalles = ""
+            clienteInfo.save()
+            data["entreCalles"] = ""
+        except Exception:
+            print("NO_entreCalles")
+
         return Response(
-            data={"id": id},
-            status=status.HTTP_202_ACCEPTED
+            data=data,
+            status=status.HTTP_301_MOVED_PERMANENTLY
         )
 
     def retrieve(self, request, *args, **kwargs):
