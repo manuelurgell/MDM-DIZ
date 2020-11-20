@@ -338,10 +338,11 @@ class ClientViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
+        serializer = {}
+        serializer['id'] = clienteInfo.cliente.id
         serializer = serializers.ClienteInfoSerializer(
             clienteInfo
         ).data
-        serializer['id'] = clienteInfo.cliente.id
 
         return Response(
             data=serializer,
