@@ -185,6 +185,12 @@ class FacturaViewSet(viewsets.ModelViewSet):
             compra = Compra.objects.get(
                 id=compra_id
             )
+            cliente = compra.cliente
+            if cliente.is_deleted:
+                return Response(
+                    data={"Response": "NOT_FOUND"},
+                    status=status.HTTP_404_NOT_FOUND
+                )
         except Exception:
             return Response(
                 data={"Response": "NOT_FOUND"},
@@ -237,9 +243,23 @@ class FacturaViewSet(viewsets.ModelViewSet):
         )
 
     def retrieve(self, request, *args, **kwargs):
+        try:
+            factura = self.get_object()
+            cliente = factura.compra.cliente
+            if cliente.is_deleted:
+                return Response(
+                    data={"Response": "NOT_FOUND"},
+                    status=status.HTTP_404_NOT_FOUND
+                )
+            serializer = serializers.FacturaSerializer(factura)
+        except Exception:
+            return Response(
+                data={"Response": "NOT_FOUND"},
+                status=status.HTTP_404_NOT_FOUND
+            )
         return Response(
-            data={"BOSS ERROR": "XIME NO ESTÁ SATISFECHA"},
-            status=status.HTTP_417_EXPECTATION_FAILED
+            data=serializer.data,
+            status=status.HTTP_302_FOUND
         )
 
     def update(self, request, *args, **kwargs):
