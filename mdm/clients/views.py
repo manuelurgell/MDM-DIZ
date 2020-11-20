@@ -295,15 +295,19 @@ class ClientViewSet(viewsets.ModelViewSet):
         )
 
     def update(self, request, *args, **kwargs):
+        telefono = False
+        correo = False
+        tarjeta = False
+        direccion = False
+
         try:
             cliente = self.get_object()
+            if cliente.is_deleted:
+                return Response(
+                    data={"Response": "NOT_FOUND"},
+                    status=status.HTTP_404_NOT_FOUND
+                )
         except Exception:
-            return Response(
-                data={"Response": "NOT_FOUND"},
-                status=status.HTTP_404_NOT_FOUND
-            )
-
-        if cliente.is_deleted:
             return Response(
                 data={"Response": "NOT_FOUND"},
                 status=status.HTTP_404_NOT_FOUND
@@ -318,13 +322,46 @@ class ClientViewSet(viewsets.ModelViewSet):
             )
 
         try:
-            clienteInfo = ClienteInfo.objects.create(
+            ClienteInfo.objects.get(
                 cliente=cliente,
-                telefono=new_cliente_info['telefono'],
-                correo=new_cliente_info['correo'],
+                telefono=new_cliente_info['telefono']
+            )
+            return Response(
+                data={"Response": "FIELD_ALREADY_EXISTS"},
+                status=status.HTTP_409_CONFLICT
+            )
+        except Exception:
+            telefono = True
+
+        try:
+            ClienteInfo.objects.get(
+                cliente=cliente,
+                correo=new_cliente_info['correo']
+            )
+            return Response(
+                data={"Response": "FIELD_ALREADY_EXISTS"},
+                status=status.HTTP_409_CONFLICT
+            )
+        except Exception:
+            correo = True
+
+        try:
+            ClienteInfo.objects.get(
+                cliente=cliente,
                 noTarjeta=new_cliente_info['noTarjeta'],
                 mesTarjeta=new_cliente_info['mesTarjeta'],
-                anioTarjeta=new_cliente_info['anioTarjeta'],
+                anioTarjeta=new_cliente_info['anioTarjeta']
+            )
+            return Response(
+                data={"Response": "FIELD_ALREADY_EXISTS"},
+                status=status.HTTP_409_CONFLICT
+            )
+        except Exception:
+            tarjeta = True
+
+        try:
+            ClienteInfo.objects.get(
+                cliente=cliente,
                 calle=new_cliente_info['calle'],
                 colonia=new_cliente_info['colonia'],
                 ciudad=new_cliente_info['ciudad'],
@@ -332,7 +369,35 @@ class ClientViewSet(viewsets.ModelViewSet):
                 estado=new_cliente_info['estado'],
                 entreCalles=new_cliente_info['entreCalles']
             )
+            return Response(
+                data={"Response": "FIELD_ALREADY_EXISTS"},
+                status=status.HTTP_409_CONFLICT
+            )
         except Exception:
+            direccion = True
+
+        if correo and telefono and tarjeta and direccion:
+            try:
+                clienteInfo = ClienteInfo.objects.create(
+                    cliente=cliente,
+                    telefono=new_cliente_info['telefono'],
+                    correo=new_cliente_info['correo'],
+                    noTarjeta=new_cliente_info['noTarjeta'],
+                    mesTarjeta=new_cliente_info['mesTarjeta'],
+                    anioTarjeta=new_cliente_info['anioTarjeta'],
+                    calle=new_cliente_info['calle'],
+                    colonia=new_cliente_info['colonia'],
+                    ciudad=new_cliente_info['ciudad'],
+                    cp=new_cliente_info['cp'],
+                    estado=new_cliente_info['estado'],
+                    entreCalles=new_cliente_info['entreCalles']
+                )
+            except Exception:
+                return Response(
+                    data={"Response": "BAD_REQUEST"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+        else:
             return Response(
                 data={"Response": "BAD_REQUEST"},
                 status=status.HTTP_400_BAD_REQUEST
