@@ -581,7 +581,7 @@ class ClienteRetrieveView(mixins.ListModelMixin, viewsets.GenericViewSet):
             if not cliente.is_deleted:
                 return Response(
                     data={"Response": cliente.id},
-                    status=status.HTTP_302_FOUND
+                    status=status.HTTP_202_ACCEPTED
                 )
             else:
                 return Response(
@@ -742,7 +742,7 @@ class ClienteRetrieveView(mixins.ListModelMixin, viewsets.GenericViewSet):
 
         return Response(
             data=data,
-            status=status.HTTP_301_MOVED_PERMANENTLY
+            status=status.HTTP_202_ACCEPTED
         )
 
     def retrieve(self, request, *args, **kwargs):

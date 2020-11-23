@@ -131,7 +131,7 @@ class CompraViewSet(viewsets.ModelViewSet):
             )
         return Response(
             data=data,
-            status=status.HTTP_302_FOUND
+            status=status.HTTP_202_ACCEPTED
         )
 
     def update(self, request, *args, **kwargs):
@@ -259,7 +259,7 @@ class FacturaViewSet(viewsets.ModelViewSet):
             )
         return Response(
             data=serializer.data,
-            status=status.HTTP_302_FOUND
+            status=status.HTTP_202_ACCEPTED
         )
 
     def update(self, request, *args, **kwargs):
